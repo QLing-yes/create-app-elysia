@@ -1,5 +1,4 @@
 import * as esbuild from 'esbuild';
-import { downloadRemoteFiles } from './download.js';
 
 await esbuild.build({
   // 
@@ -98,7 +97,5 @@ await esbuild.build({
   jsxFactory: 'React.createElement',
   jsxFragment: 'React.Fragment',
 });
-
-downloadRemoteFiles(process.cwd());
 
 console.log('✅ 打包完成！产物已生成到 dist/index.js');

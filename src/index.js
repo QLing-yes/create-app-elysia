@@ -298,16 +298,15 @@ async function applyTemplate(templateName, destDir, templateRoot, required = fal
  * @param {string[]} featureNames  - 可选 feature 模板名称列表
  * @param {string}   destDir       - 目标目录
  * @param {string}   templateRoot  - 模板根目录
- * @param {string}   [packageManager] - 包管理器
  * @returns {Promise<void>}
  */
-async function applyTemplates(baseTemplate, featureNames, destDir, templateRoot, packageManager) {
+async function applyTemplates(baseTemplate, featureNames, destDir, templateRoot) {
   await applyTemplate(baseTemplate, destDir, templateRoot, true);
-  await invokeTemplateConfig(baseTemplate, destDir, templateRoot, packageManager);
+  await invokeTemplateConfig(baseTemplate, destDir, templateRoot);
 
   for (const name of featureNames) {
     await applyTemplate(name, destDir, templateRoot, false);
-    await invokeTemplateConfig(name, destDir, templateRoot, packageManager);
+    await invokeTemplateConfig(name, destDir, templateRoot);
   }
 }
 
@@ -316,10 +315,9 @@ async function applyTemplates(baseTemplate, featureNames, destDir, templateRoot,
  * @param {string} templateName - 模板名称
  * @param {string} destDir      - 目标目录（项目根目录）
  * @param {string} templateRoot - 模板根目录
- * @param {string} [packageManager] - 包管理器
  * @returns {Promise<void>}
  */
-async function invokeTemplateConfig(templateName, destDir, templateRoot, packageManager) {
+async function invokeTemplateConfig(templateName, destDir, templateRoot) {
   const src = path.resolve(templateRoot, templateName);
   const configPath = path.join(src, '_config.js');
 
@@ -329,7 +327,7 @@ async function invokeTemplateConfig(templateName, destDir, templateRoot, package
     const configURL = pathToFileURL(configPath);
     const configModule = await import(configURL);
     if (configModule.default && typeof configModule.default === 'function') {
-      await configModule.default({ projectDir: destDir, templateName, packageManager });
+      await configModule.default({ projectDir: destDir, templateName });
       logger.step(`调用模板配置: ${templateName}/_config.js`);
     }
   } catch (err) {
@@ -523,23 +521,38 @@ async function askSelection(selectOpt) {
   return select({ message: '选择模板', choices: SELECTION_CHOICES })
 }
 
-/**
- * 收集包管理器选项
- * @returns {Promise<string>}
- */
-async function askPackageManager() {
-  return select({
-    message: '选择包管理器',
-    choices: [
-      { name: `${chalk.cyan('bun')} (推荐)`, value: 'bun' },
-      { name: 'npm', value: 'npm' },
-      { name: 'pnpm', value: 'pnpm' },
-      { name: 'yarn', value: 'yarn' },
-    ],
-  });
-}
-
 // ── 主流程 ────────────────────────────────────────────────────────────────────
+
+/**
+ * 从远程仓库的 template 分支拉取并覆盖本地 template 文件夹
+ * @returns {Promise<void>}
+ */
+async function updateTemplateFolder() {
+  const repo = 'git@github.com:QLing-yes/ElysiaTemplate.git';
+  const branch = 'template';
+  const templateRoot = path.join(__dirname$1, '..', 'template');
+  const tempDir = path.join(__dirname$1, '..', '.temp-template');
+
+  try {
+    const spinner = ora('同步远程模板…').start();
+
+    await git.cloneRepo({ repo, dest: tempDir, branch, depth: 1 });
+
+    const entries = await fs.readdir(tempDir, { withFileTypes: true });
+    for (const entry of entries) {
+      if (entry.isDirectory()) {
+        await fs.remove(path.join(templateRoot, entry.name));
+        await fs.copy(path.join(tempDir, entry.name), path.join(templateRoot, entry.name));
+      }
+    }
+
+    await fs.remove(tempDir);
+    await fs.remove(path.join(templateRoot, '.git'));
+    spinner.succeed('远程模板同步完成');
+  } catch (err) {
+    logger.warn(`远程模板同步失败: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
 
 /**
  * CLI 主流程：询问 → 确认 → 克隆 → 应用模板 → 后处理操作
@@ -549,6 +562,8 @@ async function askPackageManager() {
  */
 async function handleCreate(nameArg, opts) {
   logger.banner('create-app-elysia', `v${pkg.version}  ·  ElysiaJS 项目脚手架`);
+
+  await updateTemplateFolder();
 
   const templateDirs = await getTemplateDirs();
   VALID_SELECTIONS = new Set(templateDirs);
@@ -566,7 +581,6 @@ async function handleCreate(nameArg, opts) {
 
   const projectName = await askProjectName(nameArg);
   const selection   = await askSelection(opts.select);
-  const packageManager = opts.yes ? 'bun' : await askPackageManager();
   const projectDir  = path.resolve(process.cwd(), projectName);
 
   // 目录冲突处理
@@ -600,7 +614,7 @@ async function handleCreate(nameArg, opts) {
   // Step 1 — 拉取项目模板
   const repo = fileConfig.template ?? git.DEFAULT_REPO;
   try {
-    await git.cloneRepo({ repo, dest: projectDir });
+    await git.cloneRepo({ repo, dest: projectDir, branch: 'main' });
   } catch (err) {
     await fsu.removeDir(projectDir);
     logger.error('克隆失败，已清理目标目录', err);
@@ -608,7 +622,7 @@ async function handleCreate(nameArg, opts) {
 
   // Step 2 — 应用模板覆盖文件
   const templateRoot = path.join(__dirname$1, '..', 'template');
-  await fsu.applyTemplates(selection, [], projectDir, templateRoot, packageManager);
+  await fsu.applyTemplates(selection, [], projectDir, templateRoot);
 
   // Step 3 — 按选择执行后处理操作
   const ctx = { projectDir, projectName, selection };
@@ -624,6 +638,9 @@ async function handleCreate(nameArg, opts) {
   console.log(`    ${chalk.cyan('cd')} ${projectName}`);
   for (const s of steps) console.log(`    ${chalk.cyan(s)}`);
   console.log();
+
+  // 流程结束，清空 template 文件夹
+  await fs.emptyDir(templateRoot);
 }
 
 // ── Commander ─────────────────────────────────────────────────────────────────
