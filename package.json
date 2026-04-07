@@ -1,6 +1,6 @@
 {
   "name": "create-app-elysia",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "type": "module",
   "description": "Scaffold an ElysiaJS project from template",
   "main": "dist/index.js",
