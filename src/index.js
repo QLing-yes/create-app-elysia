@@ -23,7 +23,7 @@ const APP_CONFIG = {
   defaultRepo: 'https://github.com/QLing-yes/ElysiaTemplate.git',
 
   /** 用于同步本地 template 文件夹的远程仓库 */
-  templateSyncRepo: 'git@github.com:QLing-yes/ElysiaTemplate.git',
+  templateSyncRepo: 'https://github.com/QLing-yes/ElysiaTemplate.git',
 
   /** 同步时拉取的分支名 */
   templateSyncBranch: 'template',
