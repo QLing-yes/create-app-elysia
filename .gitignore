@@ -1,4 +1,6 @@
 /node_modules
 /dist
 /my-elysia-app
+package-lock.json
+bun.lock
 **/*.tgz
