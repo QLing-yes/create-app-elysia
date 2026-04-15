@@ -3,7 +3,8 @@
  * 根据项目类型决定是否显示（Monorepo 跳过）
  */
 
-import { prompt } from "enquirer";
+import enquirer from 'enquirer';
+const { prompt } = enquirer; 
 import type { PreferencesType } from "../utils";
 
 export interface DatabaseResult {

@@ -2,7 +2,8 @@
  * 步骤 3: 询问 Elysia 插件选择
  */
 
-import { prompt } from "enquirer";
+import enquirer from 'enquirer';
+const { prompt } = enquirer; 
 import type { PreferencesType } from "../utils";
 
 export interface PluginsResult {

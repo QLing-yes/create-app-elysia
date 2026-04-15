@@ -3,7 +3,8 @@
  * Redis, S3, Posthog, Jobify 等第三方服务
  */
 
-import { prompt } from "enquirer";
+import enquirer from 'enquirer';
+const { prompt } = enquirer; 
 import type { PreferencesType } from "../utils";
 
 export interface IntegrationsResult {

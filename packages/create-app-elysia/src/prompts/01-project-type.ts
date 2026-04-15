@@ -3,7 +3,8 @@
  * Monorepo 还是 Standalone 单体应用
  */
 
-import { prompt } from "enquirer";
+import enquirer from 'enquirer';
+const { prompt } = enquirer; 
 
 export interface ProjectTypeResult {
   isMonorepo: boolean;

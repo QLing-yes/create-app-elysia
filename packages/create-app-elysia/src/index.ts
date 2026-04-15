@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Create Elysia App - 主入口文件
- * 
+ *
  * 第四层：执行主控层
  * 负责串联所有层级，实现项目生成流程
  * 
@@ -20,10 +20,11 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import minimist from "minimist";
 import task from "tasuku";
-import { prompt } from "enquirer";
 import dedent from "ts-dedent";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
+import enquirer from 'enquirer';
+const { prompt } = enquirer; 
 
 // ========== 第一层：工具层 ==========
 import {
@@ -87,9 +88,9 @@ import {
 const execAsync = promisify(exec);
 
 // ========== 错误处理 ==========
-process.on("unhandledRejection", async (error) => {
-  console.error(error);
-  console.error("Unhandled rejection detected. The process will be terminated.");
+process.on("unhandledRejection", async (err) => {
+  console.error(err);
+  error("Unhandled rejection detected. The process will be terminated.");
   process.exit(1);
 });
 
@@ -176,12 +177,16 @@ async function main() {
   preferences.noInstall = !Boolean(args.install ?? true);
 
   // 6. 检查目录是否为空，如果不为空则询问是否覆盖
-  const filesInTargetDirectory = await fs.readdir(projectDir).catch(() => []);
+  const filesInTargetDirectory = await fs
+    .readdir(projectDir)
+    .catch(() => []);
   if (filesInTargetDirectory.length) {
     const { overwrite } = await prompt<{ overwrite: boolean }>({
       type: "toggle",
       name: "overwrite",
-      message: `\n${filesInTargetDirectory.join("\n")}\n\nThe directory ${projectName} is not empty. Do you want to delete the files?`,
+      message: `\n${filesInTargetDirectory.join(
+        "\n"
+      )}\n\nThe directory ${projectName} is not empty. Do you want to delete the files?`,
       initial: true,
     });
 
@@ -211,20 +216,11 @@ async function main() {
       getTSConfig(preferences)
     );
 
-    await writeFile(
-      joinPath(projectDir, ".gitignore"),
-      getGitIgnore()
-    );
+    await writeFile(joinPath(projectDir, ".gitignore"), getGitIgnore());
 
-    await writeFile(
-      joinPath(projectDir, "README.md"),
-      getReadme(preferences)
-    );
+    await writeFile(joinPath(projectDir, "README.md"), getReadme(preferences));
 
-    await writeFile(
-      joinPath(projectDir, ".env"),
-      getEnvFile(preferences)
-    );
+    await writeFile(joinPath(projectDir, ".env"), getEnvFile(preferences));
 
     await writeFile(
       joinPath(projectDir, ".env.production"),
@@ -276,8 +272,8 @@ async function main() {
           preferences.database === "PostgreSQL"
             ? `// import { pgTable } from "drizzle-orm/pg-core"`
             : preferences.database === "MySQL"
-              ? `// import { mysqlTable } from "drizzle-orm/mysql-core"`
-              : `// import { sqliteTable } from "drizzle-orm/sqlite-core"`;
+            ? `// import { mysqlTable } from "drizzle-orm/mysql-core"`
+            : `// import { sqliteTable } from "drizzle-orm/sqlite-core"`;
 
         await writeFile(joinPath(projectDir, "src/db/schema.ts"), schemaContent);
 
@@ -415,10 +411,7 @@ async function main() {
 
     // ========== 7.7 Telegram Bot 文件（条件生成） ==========
     if (preferences.telegramRelated && !preferences.isMonorepo) {
-      await writeFile(
-        joinPath(projectDir, "src/bot.ts"),
-        getBotFile()
-      );
+      await writeFile(joinPath(projectDir, "src/bot.ts"), getBotFile());
     }
 
     setTitle("✅ Template generation is complete!");

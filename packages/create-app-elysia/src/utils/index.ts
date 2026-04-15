@@ -24,6 +24,7 @@ export {
   pmInstallFrozenLockfile,
   pmInstallFrozenLockfileProduction,
   getInstallCommand,
+  exec,
 } from "./package-manager";
 
 // 日志工具
@@ -41,5 +42,4 @@ export {
 export { Preferences } from "./preferences";
 export type { PreferencesType } from "./preferences";
 
-// 从原 utils.ts 保持向后兼容
-export { exec } from "./package-manager";
+

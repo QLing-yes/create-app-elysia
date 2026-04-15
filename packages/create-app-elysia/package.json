@@ -1,9 +1,13 @@
 {
   "name": "create-app-elysia",
   "version": "0.1.0",
-  "description": "cli 生成elysia 项目",
+  "description": "cli 生成 elysia 项目",
   "homepage": "https://github.com/QLing-yes/create-app-elysia/tree/main/packages/create-app-elysia#readme",
   "license": "MIT",
+  "type": "module",
+  "bin": {
+    "create-app-elysia": "./dist/index.js"
+  },
   "files": [
     "dist"
   ],
@@ -12,7 +16,15 @@
     "url": "git+https://github.com/QLing-yes/create-app-elysia.git"
   },
   "scripts": {
+    "dev": "bun run  src/index.ts  my-elysia-app",
+    "build": "pkgroll --minify",
     "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "enquirer": "^2.4.1",
+    "minimist": "^1.2.8",
+    "tasuku": "^2.3.0",
+    "ts-dedent": "^2.2.0"
   },
   "peerDependencies": {
     "typescript": ">=4.5.0"
@@ -21,17 +33,5 @@
     "typescript": {
       "optional": true
     }
-  },
-  "type": "module",
-  "exports": {
-    ".": {
-      "import": {
-        "types": "./dist/index.d.ts",
-        "default": "./dist/index.js"
-      }
-    },
-    "./package.json": "./package.json"
-  },
-  "module": "./dist/index.js",
-  "types": "./dist/index.d.ts"
+  }
 }
