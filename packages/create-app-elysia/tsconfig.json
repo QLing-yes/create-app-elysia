@@ -1,0 +1,13 @@
+{
+	"extends": "../../tsconfig.base.json",
+	"types": [
+		"node"
+	],
+	"compilerOptions": {
+		"declaration": true,
+		"isolatedDeclarations": true
+	},
+	"include": [
+		"src/**/*"
+	]
+}

@@ -1,51 +1,25 @@
 {
   "name": "create-app-elysia",
-  "version": "1.0.9",
-  "type": "module",
-  "description": "Scaffold an ElysiaJS project from template",
-  "main": "dist/index.js",
-  "bin": {
-    "create-app-elysia": "./dist/index.js"
-  },
-  "keywords": [
-    "elysia",
-    "elysiajs",
-    "backend",
-    "template",
-    "typescript",
-    "bun"
-  ],
   "license": "MIT",
-  "author": "QLing-yes",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/QLing-yes/create-app-elysia"
-  },
-  "engines": {
-    "node": ">=18.0.0"
-  },
   "scripts": {
-    "dev": "node src/index.js",
-    "esbuild": "node src/esbuild.js",
-    "preview": "npm run esbuild && node dist/index.js",
-    "pack": "npm pack",
-    "login": "npm login --registry=https://registry.npmjs.org/",
-    "pub": "npm run build && npm publish"
+    "build": "bunup",
+    "dev": "bunup --watch",
+    "type-check": "bun run --filter '*' type-check"
   },
-  "files": [
-    "dist/",
-    "template/"
-  ],
   "devDependencies": {
-    "esbuild": "^0.24.0"
+    "@types/bun": "^1.3.12",
+    "@types/node": "^25.6.0",
+    "bunup": "^0.16.31",
+    "typescript": "^6.0.2"
   },
   "dependencies": {
-    "@inquirer/prompts": "^7.5.0",
-    "chalk": "^5.4.1",
-    "commander": "^13.1.0",
-    "cosmiconfig": "^9.0.0",
-    "fs-extra": "^11.3.0",
-    "ora": "^8.1.1",
-    "simple-git": "^3.27.0"
-  }
+    "enquirer": "^2.4.1",
+    "minimist": "^1.2.8",
+    "tasuku": "^2.0.1"
+  },
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
+  "type": "module"
 }
