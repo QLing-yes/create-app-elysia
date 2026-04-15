@@ -1,5 +1,9 @@
 import type { Preferences } from "../utils";
 
+/**
+ * 生成 Elysia 服务器文件 (src/server.ts)
+ * 配置 Elysia 框架和各种插件
+ */
 export function getElysiaIndex({
 	orm,
 	driver,
@@ -13,6 +17,7 @@ export function getElysiaIndex({
 		`import { config } from "./config.ts"`,
 	];
 
+	// 根据用户选择的插件添加相应的导入和配置
 	if (plugins.includes("Logger")) {
 		elysiaImports.push(`import { logger } from "@bogeychan/elysia-logger"`);
 		elysiaPlugins.push(".use(logger())");
@@ -57,8 +62,10 @@ export function getElysiaIndex({
 		elysiaPlugins.push(".use(autoload())");
 	}
 
+	// 添加默认路由
 	elysiaPlugins.push(`.get("/", "Hello World")`);
 
+	// 如果与 Telegram 相关，添加 webhook 路由
 	if (telegramRelated && !isMonorepo) {
 		elysiaImports.push(`import { bot } from "./bot.ts"`);
 		elysiaImports.push(`import { webhookHandler } from "./services/auth.ts"`);
@@ -71,6 +78,7 @@ export function getElysiaIndex({
 		);
 	}
 
+	// 组合生成服务器文件
 	return [
 		...elysiaImports,
 		"",

@@ -1,5 +1,6 @@
 import type { Preferences } from "../utils.js";
 
+// 驱动名称到 Drizzle ORM 模块的映射
 export const driverNamesToDrizzle: Record<Preferences["driver"], string> = {
 	"node-postgres": "node-postgres",
 	"Bun.sql": "bun-sql",
@@ -9,6 +10,7 @@ export const driverNamesToDrizzle: Record<Preferences["driver"], string> = {
 	None: "",
 };
 
+// 驱动名称到 npm 包名的映射
 export const driverNames: Record<Preferences["driver"], string> = {
 	"node-postgres": "pg",
 	"Bun.sql": "??",
@@ -17,7 +19,13 @@ export const driverNames: Record<Preferences["driver"], string> = {
 	"Bun SQLite": "bun:sqlite",
 	None: "",
 };
+
+/**
+ * 生成数据库入口文件 (src/db/index.ts)
+ * 根据选择的 ORM 和驱动生成相应的数据库连接代码
+ */
 export function getDBIndex({ orm, driver, packageManager }: Preferences) {
+	// Prisma ORM 配置
 	if (orm === "Prisma")
 		return [
 			`import { PrismaClient } from "@prisma/client"`,
@@ -27,6 +35,7 @@ export function getDBIndex({ orm, driver, packageManager }: Preferences) {
 			`export * from "@prisma/client"`,
 		].join("\n");
 
+	// Drizzle - node-postgres 驱动
 	if (driver === "node-postgres")
 		return [
 			`import { drizzle } from "drizzle-orm/node-postgres"`,
@@ -43,6 +52,7 @@ export function getDBIndex({ orm, driver, packageManager }: Preferences) {
 			"})",
 		].join("\n");
 
+	// Drizzle - Postgres.JS 驱动
 	if (driver === "Postgres.JS")
 		return [
 			`import { drizzle } from "drizzle-orm/postgres-js"`,
@@ -56,6 +66,7 @@ export function getDBIndex({ orm, driver, packageManager }: Preferences) {
 			"})",
 		].join("\n");
 
+	// Drizzle - Bun.sql 驱动
 	if (driver === "Bun.sql")
 		return [
 			`import { drizzle } from "drizzle-orm/bun-sql"`,
@@ -70,6 +81,7 @@ export function getDBIndex({ orm, driver, packageManager }: Preferences) {
 			"})",
 		].join("\n");
 
+	// Drizzle - MySQL 2 驱动
 	if (driver === "MySQL 2")
 		return [
 			`import { drizzle } from "drizzle-orm/mysql2"`,
@@ -85,6 +97,7 @@ export function getDBIndex({ orm, driver, packageManager }: Preferences) {
 			"})",
 		].join("\n");
 
+	// Drizzle - Bun SQLite 驱动
 	if (driver === "Bun SQLite" && packageManager === "bun")
 		return [
 			`import { drizzle } from "drizzle-orm/bun-sqlite"`,
@@ -97,6 +110,7 @@ export function getDBIndex({ orm, driver, packageManager }: Preferences) {
 			"})",
 		].join("\n");
 
+	// Drizzle - better-sqlite3 驱动（默认）
 	return [
 		`import { drizzle } from "drizzle-orm/better-sqlite3`,
 		`import { Database } from "better-sqlite3";`,
@@ -109,6 +123,10 @@ export function getDBIndex({ orm, driver, packageManager }: Preferences) {
 	].join("\n");
 }
 
+/**
+ * 生成 Drizzle ORM 配置文件 (drizzle.config.ts)
+ * 用于数据库迁移和 schema 管理
+ */
 export function getDrizzleConfig({ database }: Preferences) {
 	return [
 		`import type { Config } from "drizzle-kit"`,

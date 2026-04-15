@@ -1,6 +1,10 @@
 import { dependencies } from "../deps";
 import { type Preferences, pmExecuteMap, pmRunMap } from "../utils";
 
+/**
+ * 生成 package.json 文件
+ * 根据用户选择动态添加依赖和脚本
+ */
 export function getPackageJson({
 	dir,
 	projectName,
@@ -21,10 +25,12 @@ export function getPackageJson({
 		name: projectName,
 		type: "module",
 		scripts: {
+			// 开发脚本：Bun 使用 --watch，其他使用 tsx
 			dev:
 				packageManager === "bun"
 					? "bun --watch src/index.ts"
 					: `${pmExecuteMap[packageManager]} tsx watch --env-file .env src/index.ts`,
+			// 生产启动脚本
 			start:
 				packageManager === "bun"
 					? "NODE_ENV=production bun run ./src/index.ts"
@@ -39,14 +45,17 @@ export function getPackageJson({
 		} as Record<keyof typeof dependencies, string>,
 	};
 
+	// 添加 Bun 类型定义
 	// if (packageManager === "bun")
 	sample.devDependencies["@types/bun"] = dependencies["@types/bun"];
 
+	// 配置 Biome 代码检查工具
 	if (linter === "Biome") {
 		sample.scripts.lint = `${pmExecuteMap[packageManager]} @biomejs/biome check src`;
 		sample.scripts["lint:fix"] = `${pmRunMap[packageManager]} lint --write`;
 		sample.devDependencies["@biomejs/biome"] = dependencies["@biomejs/biome"];
 	}
+	// 配置 ESLint 代码检查工具
 	if (linter === "ESLint") {
 		// \"src/**/*.ts\"
 		sample.scripts.lint = `${pmExecuteMap[packageManager]} eslint`;
@@ -55,15 +64,18 @@ export function getPackageJson({
 		sample.devDependencies.eslint = dependencies.eslint;
 		sample.devDependencies["@antfu/eslint-config"] =
 			dependencies["@antfu/eslint-config"];
+		// 如果使用 Drizzle，添加其 ESLint 插件
 		if (orm === "Drizzle")
 			sample.devDependencies["eslint-plugin-drizzle"] =
 				dependencies["eslint-plugin-drizzle"];
 	}
 
+	// 配置 Prisma ORM
 	if (orm === "Prisma") {
 		sample.devDependencies.prisma = dependencies.prisma;
 		sample.dependencies["@prisma/client"] = dependencies["@prisma/client"];
 	}
+	// 配置 Drizzle ORM 及其驱动
 	if (orm === "Drizzle") {
 		sample.dependencies["drizzle-orm"] = dependencies["drizzle-orm"];
 		sample.devDependencies["drizzle-kit"] = dependencies["drizzle-kit"];
@@ -77,17 +89,20 @@ export function getPackageJson({
 		if (driver === "MySQL 2") {
 			sample.dependencies.mysql2 = dependencies.mysql2;
 		}
+		// Drizzle 迁移命令
 		sample.scripts.generate = `${pmExecuteMap[packageManager]} drizzle-kit generate`;
 		sample.scripts.push = `${pmExecuteMap[packageManager]} drizzle-kit push`;
 		sample.scripts.migrate = `${pmExecuteMap[packageManager]} drizzle-kit migrate`;
 		sample.scripts.studio = `${pmExecuteMap[packageManager]} drizzle-kit studio`;
 	}
 
+	// 配置 Husky Git Hooks
 	if (others.includes("Husky")) {
 		sample.devDependencies.husky = dependencies.husky;
 		sample.scripts.prepare = "husky";
 	}
 
+	// 添加 Elysia 插件依赖
 	if (plugins.includes("Bearer"))
 		sample.dependencies["@elysiajs/bearer"] = dependencies["@elysiajs/bearer"];
 	if (plugins.includes("CORS"))
@@ -113,44 +128,53 @@ export function getPackageJson({
 		sample.dependencies["@bogeychan/elysia-logger"] =
 			dependencies["@bogeychan/elysia-logger"];
 
+	// OAuth 2.0 相关依赖
 	if (plugins.includes("Oauth 2.0")) {
 		sample.dependencies.arctic = dependencies.arctic;
 		sample.dependencies["elysia-oauth2"] = dependencies["elysia-oauth2"];
 	}
 
+	// Redis 相关依赖
 	if (redis) {
 		sample.dependencies.ioredis = dependencies.ioredis;
 		if (mockWithPGLite)
 			sample.devDependencies["ioredis-mock"] = dependencies["ioredis-mock"];
 	}
 
+	// 任务队列依赖
 	if (others.includes("Jobify")) {
 		sample.dependencies.jobify = dependencies.jobify;
 	}
 
+	// 产品分析依赖
 	if (others.includes("Posthog")) {
 		sample.dependencies["posthog-node"] = dependencies["posthog-node"];
 	}
 
+	// 分布式锁依赖
 	if (locks) {
 		sample.dependencies["@verrou/core"] = dependencies["@verrou/core"];
 	}
 
+	// 单仓库模式依赖
 	if (isMonorepo)
 		sample.dependencies["@gramio/init-data"] =
 			dependencies["@gramio/init-data"];
 
+	// S3 存储依赖
 	if (others.includes("S3") && s3Client === "@aws-sdk/client-s3") {
 		sample.dependencies["@aws-sdk/client-s3"] =
 			dependencies["@aws-sdk/client-s3"];
 	}
 
+	// 测试模拟依赖
 	if (mockWithPGLite) {
 		sample.devDependencies["@electric-sql/pglite"] =
 			dependencies["@electric-sql/pglite"];
 		sample.devDependencies["@elysiajs/eden"] = dependencies["@elysiajs/eden"];
 	}
 
+	// Telegram Bot 依赖
 	if (telegramRelated && !isMonorepo) {
 		sample.dependencies.gramio = dependencies.gramio;
 		sample.dependencies["@gramio/init-data"] =

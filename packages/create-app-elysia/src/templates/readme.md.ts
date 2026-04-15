@@ -1,5 +1,6 @@
 import type { Preferences, PreferencesType } from "../utils";
 
+// 技术栈文档链接映射
 const links: Record<
 	| Exclude<
 			| "ElysiaJS"
@@ -54,6 +55,10 @@ const links: Record<
 
 const TESTS_REPO_LINK = "[tests](tree/main/tests)";
 
+/**
+ * 生成 README.md 文件
+ * 包含项目技术栈说明和使用指南
+ */
 export function getReadme({
 	dir,
 	linter,
@@ -67,6 +72,7 @@ export function getReadme({
 }: Preferences) {
 	const stack = [];
 
+	// 构建技术栈列表
 	stack.push(`- Web framework - ${links.ElysiaJS}`);
 	if (linter !== "None") stack.push(`- Linter - ${links[linter]}`);
 	if (orm !== "None")
@@ -98,6 +104,7 @@ export function getReadme({
 
 	instruction.push("## Development\n");
 
+	// Docker 启动说明
 	if (docker) {
 		instruction.push(
 			"Start development services (DB, Redis etc):\n",
@@ -109,6 +116,7 @@ export function getReadme({
 
 	instruction.push("Start the project:\n", "```bash", "bun dev", "```\n");
 
+	// Drizzle ORM 迁移说明
 	if (orm === "Drizzle") {
 		instruction.push(
 			"## Migrations\n",
@@ -127,6 +135,7 @@ export function getReadme({
 		);
 	}
 
+	// Prisma ORM 迁移说明
 	if (orm === "Prisma") {
 		instruction.push(
 			"## Migrations\n",
@@ -141,6 +150,7 @@ export function getReadme({
 		);
 	}
 
+	// 测试说明（使用 PGLite 模拟）
 	if (mockWithPGLite) {
 		instruction.push(
 			"## Tests\n",
@@ -157,6 +167,7 @@ export function getReadme({
 
 	instruction.push("## Production\n");
 
+	// 生产环境部署说明
 	if (docker) {
 		instruction.push(
 			"Run project in `production` mode:\n",

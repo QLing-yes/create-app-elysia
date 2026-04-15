@@ -9,6 +9,7 @@ import {
 	pmRunMap,
 } from "../utils.js";
 
+// ORM 相关的 Docker 复制命令映射
 const ormDockerCopy: Record<Exclude<PreferencesType["orm"], "None">, string> = {
 	Prisma: "COPY --from=prerelease /usr/src/app/prisma ./prisma",
 	Drizzle: dedent`
@@ -16,7 +17,12 @@ const ormDockerCopy: Record<Exclude<PreferencesType["orm"], "None">, string> = {
     COPY --from=prerelease /usr/src/app/drizzle.config.ts .`,
 };
 
+/**
+ * 生成 Dockerfile
+ * 使用多阶段构建优化镜像大小
+ */
 export function getDockerfile({ packageManager, orm }: Preferences) {
+	// Bun 运行时配置
 	if (packageManager === "bun")
 		return dedent /* Dockerfile */`
 # use the official Bun image
@@ -59,6 +65,7 @@ ${orm !== "None" ? ormDockerCopy[orm] : ""}
 
 ENTRYPOINT [ "bun", "start" ]`;
 
+	// Node.js 运行时配置
 	return dedent /* Dockerfile */`
 # Use the official Node.js 22 image.
 # See https://hub.docker.com/_/node for more information.
@@ -107,6 +114,10 @@ ENTRYPOINT [ "${pmRunMap[packageManager]}", "start" ]`;
 }
 
 // TODO: generate redis+postgres
+/**
+ * 生成 Docker Compose 配置文件（生产环境）
+ * 包含应用服务和数据库服务
+ */
 export function getDockerCompose({
 	database,
 	redis,
@@ -116,6 +127,7 @@ export function getDockerCompose({
 }: PreferencesType) {
 	const volumes: string[] = [];
 
+	// 根据配置添加数据卷
 	if (database === "PostgreSQL") volumes.push("postgres_data:");
 	if (redis) volumes.push("redis_data:");
 	if (others.includes("S3")) volumes.push("minio_data:");
@@ -129,6 +141,7 @@ export function getDockerCompose({
                 dockerfile: Dockerfile
             environment:
                 - NODE_ENV=production`,
+		// PostgreSQL 数据库服务
 		database === "PostgreSQL"
 			? /* yaml */ `postgres:
             container_name: ${projectName}-postgres
@@ -141,6 +154,7 @@ export function getDockerCompose({
             volumes:
                 - postgres_data:/var/lib/postgresql/data`
 			: "",
+		// Redis 服务
 		redis
 			? /* yaml */ `redis:
             container_name: ${projectName}-redis
@@ -150,6 +164,7 @@ export function getDockerCompose({
             volumes:
                 - redis_data:/data`
 			: "",
+		// MinIO S3 服务
 		others.includes("S3")
 			? /* yaml */ `minio:
             container_name: ${projectName}-minio
@@ -177,12 +192,16 @@ services:
     ${services.filter(Boolean).join("\n")}
 volumes:
     ${volumes.join("\n")}
-    
+
 networks:
     default: {}
 `;
 }
 
+/**
+ * 生成 Docker Compose 配置文件（开发环境）
+ * 仅包含数据库和 Redis 等基础设施服务
+ */
 export function getDevelopmentDockerCompose({
 	database,
 	redis,
@@ -197,6 +216,7 @@ export function getDevelopmentDockerCompose({
 	if (others.includes("S3")) volumes.push("minio_data:");
 
 	const services = [
+		// PostgreSQL 数据库服务（暴露端口）
 		database === "PostgreSQL"
 			? /* yaml */ `postgres:
             container_name: ${projectName}-postgres
@@ -211,6 +231,7 @@ export function getDevelopmentDockerCompose({
             volumes:
                 - postgres_data:/var/lib/postgresql/data`
 			: "",
+		// Redis 服务（暴露端口）
 		redis
 			? /* yaml */ `redis:
             container_name: ${projectName}-redis
@@ -222,6 +243,7 @@ export function getDevelopmentDockerCompose({
             volumes:
                 - redis_data:/data`
 			: "",
+		// MinIO S3 服务
 		others.includes("S3")
 			? /* yaml */ `minio:
             container_name: ${projectName}-minio
@@ -246,7 +268,7 @@ services:
     ${services.filter(Boolean).join("\n")}
 volumes:
     ${volumes.join("\n")}
-    
+
 networks:
     default: {}
 `;

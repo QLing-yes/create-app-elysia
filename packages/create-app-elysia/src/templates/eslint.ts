@@ -1,5 +1,9 @@
 import type { PreferencesType } from "../utils.js";
 
+/**
+ * 生成 ESLint 配置文件
+ * 使用 @antfu/eslint-config 并可选添加 Drizzle 插件
+ */
 export function generateEslintConfig({ orm }: PreferencesType) {
 	return [
 		`import antfu from "@antfu/eslint-config"`,

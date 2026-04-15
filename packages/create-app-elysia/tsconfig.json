@@ -1,11 +1,10 @@
 {
+	"schema": "https://json.schemastore.org/tsconfig",
 	"extends": "../../tsconfig.base.json",
-	"types": [
-		"node"
-	],
 	"compilerOptions": {
 		"declaration": true,
-		"isolatedDeclarations": true
+		"isolatedDeclarations": true,
+		 "types": ["node"]
 	},
 	"include": [
 		"src/**/*"

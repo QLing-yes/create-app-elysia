@@ -1,11 +1,15 @@
 import dedent from "ts-dedent";
 
+/**
+ * 生成 Telegram 认证插件 (src/services/auth.plugin.ts)
+ * 用于验证 Telegram Init Data 并提取用户信息
+ */
 export function getAuthPlugin() {
 	return dedent /* ts */`
     import { validateAndParseInitData, signInitData, getBotTokenSecretKey } from "@gramio/init-data";
     import { Elysia, t } from "elysia";
     import { config } from "../config.ts";
-    
+
     const secretKey = getBotTokenSecretKey(config.BOT_TOKEN);
 
     export const authElysia = new Elysia({
@@ -39,7 +43,7 @@ export function getAuthPlugin() {
             );
             if (!result || !result.user)
                 return error("Unauthorized", "UNAUTHORIZED");
-    
+
             return {
                 tgId: result.user.id,
                 user: result.user,
