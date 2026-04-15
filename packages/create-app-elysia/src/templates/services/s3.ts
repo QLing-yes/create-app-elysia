@@ -1,5 +1,5 @@
 import dedent from "ts-dedent";
-import type { Preferences } from "../../utils.js";
+import type { Preferences } from "../../utils";
 
 /**
  * 生成 S3 存储服务文件 (src/services/s3.ts)

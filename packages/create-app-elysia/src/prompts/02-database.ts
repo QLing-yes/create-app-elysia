@@ -102,9 +102,7 @@ export async function askDatabase(
         name: "mockWithPGLite",
         message:
           "Do you want to mock database in tests with PGLite (Postgres in WASM)?",
-        initial: "yes",
-        active: "yes",
-        inactive: "no",
+        initial: true,
       });
       mockWithPGLite = mock;
     }

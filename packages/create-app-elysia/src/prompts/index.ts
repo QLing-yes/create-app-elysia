@@ -14,4 +14,4 @@ export { askProjectType } from "./01-project-type";
 export { askDatabase } from "./02-database";
 export { askPlugins } from "./03-plugins";
 export { askIntegrations } from "./04-integrations";
-export { askDevTools } from "./05-dev-tools";
+export { askDevTools, printFormatHint } from "./05-dev-tools";

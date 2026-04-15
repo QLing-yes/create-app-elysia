@@ -52,9 +52,7 @@ export async function askDevTools(
     type: "toggle",
     name: "docker",
     message: "Create Dockerfile + docker-compose.yml?",
-    initial: "yes",
-    active: "yes",
-    inactive: "no",
+    initial: true,
   });
 
   // VSCode 配置
@@ -63,9 +61,7 @@ export async function askDevTools(
     name: "vscode",
     message:
       "Create .vscode folder with VSCode extensions recommendations and settings?",
-    initial: "yes",
-    active: "yes",
-    inactive: "no",
+    initial: true,
   });
 
   // Git 配置（如果已选择 Husky 则跳过）
@@ -75,9 +71,7 @@ export async function askDevTools(
       type: "toggle",
       name: "git",
       message: "Create an empty Git repository?",
-      initial: "yes",
-      active: "yes",
-      inactive: "no",
+      initial: true,
     });
     git = g;
   }

@@ -3,8 +3,9 @@
 	"extends": "../../tsconfig.base.json",
 	"compilerOptions": {
 		"declaration": true,
-		"isolatedDeclarations": true,
-		 "types": ["node"]
+		"types": [
+			"node"
+		]
 	},
 	"include": [
 		"src/**/*"

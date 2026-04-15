@@ -32,9 +32,7 @@ export async function askIntegrations(
       type: "toggle",
       name: "telegramRelated",
       message: "Is your project related to Telegram?",
-      initial: "no",
-      active: "yes",
-      inactive: "no",
+      initial: false,
     });
 
     return {
@@ -55,9 +53,7 @@ export async function askIntegrations(
     name: "telegramRelated",
     message:
       "Is your project related to Telegram (Did you wants to validate init data and etc)?",
-    initial: "no",
-    active: "yes",
-    inactive: "no",
+    initial: false,
   });
 
   // 询问其他集成工具
@@ -91,9 +87,7 @@ export async function askIntegrations(
       type: "toggle",
       name: "redis",
       message: "Do you want to use Redis?",
-      initial: "yes",
-      active: "yes",
-      inactive: "no",
+      initial: true,
     });
     redis = r;
   }
@@ -103,9 +97,7 @@ export async function askIntegrations(
     type: "toggle",
     name: "locks",
     message: "Do you want to use Locks to prevent race conditions?",
-    initial: "yes",
-    active: "yes",
-    inactive: "no",
+    initial: true,
   });
 
   return {

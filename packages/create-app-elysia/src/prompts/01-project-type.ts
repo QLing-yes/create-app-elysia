@@ -19,9 +19,7 @@ export async function askProjectType(): Promise<ProjectTypeResult> {
     type: "toggle",
     name: "isMonorepo",
     message: "Is this a monorepo? (Monorepo will have simplified configuration)",
-    initial: "no",
-    active: "yes",
-    inactive: "no",
+    initial: false,
   });
 
   return { isMonorepo };

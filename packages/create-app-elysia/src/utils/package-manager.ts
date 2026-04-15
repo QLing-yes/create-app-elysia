@@ -3,7 +3,12 @@
  * 检测包管理器并提供相关命令映射
  */
 
+import child_process from "node:child_process";
+import { promisify } from "node:util";
 import type { PackageManager } from "../types";
+
+// 将 child_process.exec 转换为 Promise 版本
+export const exec = promisify(child_process.exec);
 
 /**
  * 检测当前使用的包管理器
@@ -18,7 +23,14 @@ export function detectPackageManager(): PackageManager {
     );
   }
 
-  return userAgent.split(" ")[0].split("/")[0] as PackageManager;
+  const pm = userAgent.split(" ")[0]?.split("/")[0];
+  if (!pm) {
+    throw new Error(
+      `Package manager was not detected. Please specify template with "--pm bun"`
+    );
+  }
+  
+  return pm as PackageManager;
 }
 
 /**

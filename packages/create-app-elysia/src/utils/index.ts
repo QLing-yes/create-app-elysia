@@ -40,3 +40,6 @@ export {
 // 用户偏好配置
 export { Preferences } from "./preferences";
 export type { PreferencesType } from "./preferences";
+
+// 从原 utils.ts 保持向后兼容
+export { exec } from "./package-manager";
