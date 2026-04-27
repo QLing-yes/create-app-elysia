@@ -2,7 +2,7 @@
  * 体 - Telegram 认证插件 (src/services/auth.plugin.ts)
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 
 export function getAuthPlugin() {
 	return dedent /* ts */`

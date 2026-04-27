@@ -2,7 +2,7 @@
  * 体 - 测试文件生成
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 import type { Preferences } from "../../utils";
 import { driverNames, driverNamesToDrizzle } from "../db";
 

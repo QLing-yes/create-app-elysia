@@ -2,7 +2,7 @@
  * 体 - S3 存储服务文件 (src/services/s3.ts)
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 import type { Preferences } from "../../utils";
 
 export function getS3ServiceFile({ s3Client }: Preferences) {

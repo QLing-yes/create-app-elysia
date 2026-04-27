@@ -2,7 +2,7 @@
  * 体 - Verrou 分布式锁服务文件 (src/services/locks.ts)
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 import type { Preferences } from "../../utils";
 
 export function getLocksFile({ redis }: Preferences) {

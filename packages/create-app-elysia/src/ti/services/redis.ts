@@ -2,7 +2,7 @@
  * 体 - Redis 服务文件 (src/services/redis.ts)
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 
 export function getRedisFile() {
 	return dedent /* ts */`

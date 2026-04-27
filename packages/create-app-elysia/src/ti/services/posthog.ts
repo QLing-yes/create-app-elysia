@@ -2,7 +2,7 @@
  * 体 - PostHog 分析服务文件 (src/services/posthog.ts)
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 
 export function getPosthogIndex() {
 	return dedent /* ts */`

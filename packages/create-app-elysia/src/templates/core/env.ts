@@ -1,5 +1,5 @@
 import { randomBytes } from "node:crypto";
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 import type { Preferences, PreferencesType } from "../../utils";
 
 // 数据库连接 URL 示例映射

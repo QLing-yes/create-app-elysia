@@ -3,7 +3,7 @@
  * 不包含 isMonorepo 判断
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 import type { Preferences } from "../../utils";
 
 const dbExportedMap: Record<string, string> = {

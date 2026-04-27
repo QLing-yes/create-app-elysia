@@ -2,7 +2,7 @@
  * 体 - Docker 配置文件生成
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 import {
     type Preferences,
     pmExecuteMap,

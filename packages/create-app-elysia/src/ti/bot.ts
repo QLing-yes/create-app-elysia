@@ -2,7 +2,7 @@
  * 体 - Telegram Bot 文件 (src/bot.ts)
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 
 export function getBotFile() {
 	return dedent /* ts */`

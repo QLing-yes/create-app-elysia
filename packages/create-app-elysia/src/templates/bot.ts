@@ -1,4 +1,4 @@
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 
 /**
  * 生成 Telegram Bot 文件 (src/bot.ts)

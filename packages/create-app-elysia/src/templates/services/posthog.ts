@@ -1,4 +1,4 @@
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 
 /**
  * 生成 PostHog 分析服务文件 (src/services/posthog.ts)

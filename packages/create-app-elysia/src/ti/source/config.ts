@@ -2,7 +2,7 @@
  * 体 - 配置文件 (src/config.ts)
  */
 
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 import type { Preferences } from "../../utils";
 
 export function getConfigFile({

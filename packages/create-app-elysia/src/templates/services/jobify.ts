@@ -1,4 +1,4 @@
-import dedent from "ts-dedent";
+import { dedent } from "ts-dedent";
 
 /**
  * 生成 Jobify 任务队列文件 (src/services/jobify.ts)
