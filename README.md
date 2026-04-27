@@ -56,3 +56,26 @@ bun create elysiajs <dir>
 > When you select [ESLint](https://eslint.org/) and [Drizzle](https://orm.drizzle.team/), you get [eslint-plugin-drizzle](https://orm.drizzle.team/docs/eslint-plugin)
 >
 > When you select [Husky](https://typicode.github.io/husky/) and one of the [linters](#supported-environment) - the `pre-commit` hook will contain the command `lint:fix`
+
+
+```md
+src/
+├── index.ts                  # 轻量路由（~50 行）
+├── ti/                       # ═══ 体：核心能力 ═══
+│   ├── dependency.ts         # 依赖版本管理
+│   ├── install.ts            # 依赖安装
+│   ├── core/                 # package.json, tsconfig, gitignore, readme
+│   ├── source/               # server.ts, entry.ts, config.ts, env.ts
+│   ├── db/                   # 数据库模板
+│   ├── services/             # auth, redis, s3, posthog, jobify, locks
+│   ├── dev-tools/            # eslint, docker, vscode
+│   ├── tests/                # 测试模板
+│   └── bot.ts                # Telegram Bot
+├── yong/                     # ═══ 用：模式编排 ═══
+│   ├── index.ts              # 路由导出
+│   ├── standalone/           # 独立项目编排
+│   └── monorepo/             # Monorepo 编排 + 模板
+├── prompts/                  # 通用交互（仅 monorepo-detect）
+└── utils/                    # 工具层
+
+```
