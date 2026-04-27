@@ -27,7 +27,7 @@ export async function createStandalone(
 	// 漏斗式交互
 	title("🚀 Create Elysia App");
 	divider();
-	step("Collecting preferences...");
+	step("正在收集配置...");
 
 	const prompts = await runStandalonePrompts(packageManager === "bun" ? "Bun" : "Node.js");
 
@@ -59,9 +59,9 @@ export async function createStandalone(
 	divider();
 
 	// 生成文件
-	await task("Generating project files...", async ({ setTitle }) => {
+	await task("正在生成项目文件...", async ({ setTitle }) => {
 		// 基础文件
-		step("Writing base files...");
+		step("正在写入基础文件...");
 		await writeFile(joinPath(projectDir, "package.json"), ti.getPackageJson(prefs));
 		await writeFile(joinPath(projectDir, "tsconfig.json"), ti.getTSConfig(prefs));
 		await writeFile(joinPath(projectDir, ".gitignore"), ti.getGitIgnore());
@@ -70,7 +70,7 @@ export async function createStandalone(
 		await writeFile(joinPath(projectDir, ".env.production"), ti.getEnvFile(prefs, true));
 
 		// 核心文件
-		step("Writing core files...");
+		step("正在写入核心文件...");
 		await createOrFindDir(joinPath(projectDir, "src"));
 		await writeFile(joinPath(projectDir, "src/server.ts"), ti.getElysiaIndex(prefs));
 		await writeFile(joinPath(projectDir, "src/index.ts"), ti.getIndex(prefs));
@@ -79,7 +79,7 @@ export async function createStandalone(
 
 		// 数据库
 		if (prefs.orm !== "None") {
-			step("Writing database files...");
+			step("正在写入数据库文件...");
 			await createOrFindDir(joinPath(projectDir, "src/db"));
 			await writeFile(joinPath(projectDir, "src/db/index.ts"), ti.getDBIndex(prefs));
 
@@ -140,7 +140,7 @@ export async function createStandalone(
 
 		// 测试
 		if (prefs.mockWithPGLite) {
-			step("Writing test files...");
+			step("正在写入测试文件...");
 			await createOrFindDir(joinPath(projectDir, "tests"));
 			await writeFile(joinPath(projectDir, "tests/preload.ts"), ti.getPreloadFile(prefs));
 			await writeFile(joinPath(projectDir, "tests/api.ts"), ti.getTestsAPIFile());
@@ -162,7 +162,7 @@ export async function createStandalone(
 			await writeFile(joinPath(projectDir, "src/bot.ts"), ti.getBotFile());
 		}
 
-		setTitle("✅ Template generation is complete!");
+		setTitle("✅ 模板生成完成！");
 	});
 
 	// 安装依赖
@@ -177,20 +177,20 @@ export async function createStandalone(
 
 	// 完成提示
 	divider();
-	success("🎉 Project created successfully!");
+	success("🎉 项目创建成功！");
 	divider();
 	console.log(`
-📁 Project location: ${projectDir}
+	📁 项目位置：${projectDir}
 
-🚀 Next steps:
-   cd ${dir}
-   bun dev
+	🚀 下一步：
+	   cd ${dir}
+	   bun dev
 
-💡 Tip: To format your code:
-   bun run lint:fix
-   npx ultracite init
-   npx ultracite fix
-`);
+	💡 提示：格式化代码：
+	   bun run lint:fix
+	   npx ultracite init
+	   npx ultracite fix
+	`);
 	printFormatHint(packageManager);
 }
 
@@ -200,12 +200,12 @@ async function checkAndClearDirectory(projectDir: string, projectName: string) {
 		const { overwrite } = await prompt<{ overwrite: boolean }>({
 			type: "toggle",
 			name: "overwrite",
-			message: `\n${filesInTargetDirectory.join("\n")}\n\nThe directory ${projectName} is not empty. Do you want to delete the files?`,
+			message: `\n${filesInTargetDirectory.join("\n")}\n\n目录 ${projectName} 不为空，是否删除这些文件？`,
 			initial: true,
 		});
 
 		if (!overwrite) {
-			info("Cancelled...");
+			info("已取消...");
 			process.exit(0);
 		}
 
@@ -216,12 +216,12 @@ async function checkAndClearDirectory(projectDir: string, projectName: string) {
 
 function printFormatHint(packageManager: string) {
 	console.log(`
-💡 Tip: To format your code, run one of the following commands:
+	💡 提示：格式化代码，运行以下命令之一：
 
-   ${packageManager} run lint:fix
+	   ${packageManager} run lint:fix
 
-   Or with ultracite:
-   npx ultracite init
-   npx ultracite fix
-`);
+	   或使用 ultracite：
+	   npx ultracite init
+	   npx ultracite fix
+	`);
 }

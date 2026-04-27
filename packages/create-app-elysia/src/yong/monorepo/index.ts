@@ -51,8 +51,8 @@ export async function createNewMonorepo(
 	await checkAndClearDirectory(projectDir, projectName);
 	divider();
 
-	await task("Generating monorepo structure...", async ({ setTitle }) => {
-		step("Writing root files...");
+	await task("正在生成 Monorepo 结构...", async ({ setTitle }) => {
+		step("正在写入根目录文件...");
 		await writeFile(joinPath(projectDir, "package.json"), getMonorepoRootPackageJson(monorepoName));
 		await writeFile(joinPath(projectDir, "turbo.json"), getTurboJson());
 		await writeFile(joinPath(projectDir, "tsconfig.json"), getMonorepoRootTsConfig());
@@ -74,7 +74,7 @@ export async function createNewMonorepo(
 		);
 
 		// packages/contract
-		step("Writing packages/contract...");
+		step("正在写入 packages/contract...");
 		const contractDir = joinPath(projectDir, "packages", "contract", "src");
 		await createOrFindDir(contractDir);
 		await writeFile(joinPath(projectDir, "packages/contract/package.json"), getContractPackageJson());
@@ -89,14 +89,14 @@ export async function createNewMonorepo(
 		);
 
 		// packages/tsconfig
-		step("Writing packages/tsconfig...");
+		step("正在写入 packages/tsconfig...");
 		const tsconfigDir = joinPath(projectDir, "packages", "tsconfig");
 		await createOrFindDir(tsconfigDir);
 		await writeFile(joinPath(projectDir, "packages/tsconfig/package.json"), getTsConfigPackage());
 		await writeFile(joinPath(projectDir, "packages/tsconfig/base.json"), getBaseTsConfig());
 
 		// apps/api
-		step("Writing apps/api...");
+		step("正在写入 apps/api...");
 		const apiDir = joinPath(projectDir, "apps", "api", "src");
 		await createOrFindDir(apiDir);
 		await writeFile(joinPath(projectDir, "apps/api/package.json"), getMonorepoNewAppPackageJson("api"));
@@ -106,34 +106,34 @@ export async function createNewMonorepo(
 		await writeFile(joinPath(projectDir, "apps/api/.gitignore"), getMonorepoAppGitignore());
 		await writeFile(joinPath(projectDir, "apps/api/README.md"), getMonorepoAppReadme("api"));
 
-		setTitle("✅ Monorepo structure is complete!");
+		setTitle("✅ Monorepo 结构生成完成！");
 	});
 
 	const noInstall = !Boolean(args.install ?? true);
 	if (!noInstall) {
-		await task("Installing dependencies...", async () => {
+		await task("正在安装依赖...", async () => {
 			await execAsync("bun install", { cwd: projectDir }).catch((e) => console.error(e));
 		});
 	}
 
 	divider();
-	success("🎉 Monorepo created successfully!");
+	success("🎉 Monorepo 创建成功！");
 	divider();
 	console.log(`
-📁 Project location: ${projectDir}
+	📁 项目位置：${projectDir}
 
-🚀 Next steps:
-   cd ${dir}
-   bun run dev
+	🚀 下一步：
+	   cd ${dir}
+	   bun run dev
 
-📦 Structure:
-   apps/api/         - Elysia backend
-   packages/contract - Shared schemas
-   packages/tsconfig - Shared TS config
+	📦 结构：
+	   apps/api/         - Elysia 后端
+	   packages/contract - 共享 Schema
+	   packages/tsconfig - 共享 TS 配置
 
-💡 Run specific app:
-   bun run dev --filter=api
-`);
+	💡 运行特定应用：
+	   bun run dev --filter=api
+	`);
 }
 
 /**
@@ -148,8 +148,8 @@ export async function addAppToMonorepo(
 	const location = await askMonorepoLocation(monorepoRoot, ws.apps, ws.packages);
 	divider();
 
-	await task("Creating new app in monorepo...", async ({ setTitle }) => {
-		step(`Writing ${location.locationType}/${location.projectName}...`);
+	await task("正在 Monorepo 中创建新应用...", async ({ setTitle }) => {
+		step(`正在写入 ${location.locationType}/${location.projectName}...`);
 		const appDir = location.fullPath;
 		await createOrFindDir(joinPath(appDir, "src"));
 
@@ -160,24 +160,24 @@ export async function addAppToMonorepo(
 		await writeFile(joinPath(appDir, ".gitignore"), getMonorepoAppGitignore());
 		await writeFile(joinPath(appDir, "README.md"), getMonorepoAppReadme(location.projectName));
 
-		setTitle(`✅ App ${location.projectName} created!`);
+		setTitle(`✅ 应用 ${location.projectName} 创建成功！`);
 	});
 
 	divider();
-	success(`🎉 App created in monorepo!`);
+	success(`🎉 应用创建成功！`);
 	divider();
 
 	const relativePath = path.relative(monorepoRoot, location.fullPath);
 	console.log(`
-📁 App location: ${relativePath}
+	📁 应用位置：${relativePath}
 
-🚀 Next steps:
-   cd ${relativePath}
-   bun run dev
+	🚀 下一步：
+	   cd ${relativePath}
+	   bun run dev
 
-💡 Run from monorepo root:
-   bun run dev --filter=${location.projectName}
-`);
+	💡 从 Monorepo 根目录运行：
+	   bun run dev --filter=${location.projectName}
+	`);
 }
 
 async function checkAndClearDirectory(projectDir: string, projectName: string) {
@@ -187,12 +187,12 @@ async function checkAndClearDirectory(projectDir: string, projectName: string) {
 		const { overwrite } = await prompt<{ overwrite: boolean }>({
 			type: "toggle",
 			name: "overwrite",
-			message: `\n${filesInTargetDirectory.join("\n")}\n\nThe directory ${projectName} is not empty. Do you want to delete the files?`,
+			message: `\n${filesInTargetDirectory.join("\n")}\n\n目录 ${projectName} 不为空，是否删除这些文件？`,
 			initial: true,
 		});
 
 		if (!overwrite) {
-			info("Cancelled...");
+			info("已取消...");
 			process.exit(0);
 		}
 

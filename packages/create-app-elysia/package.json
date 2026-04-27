@@ -18,7 +18,7 @@
   "scripts": {
     "dev": "bun run  src/index.ts  my-elysia-app",
     "build": "bun build src/index.ts --outdir ./dist --format esm --target node",
-    "start": "bun run dist/index.js",
+    "start": "bun run dist/index.js my-test-app",
     "gen-types": "bun run scripts/01json2type.ts",
     "type-check": "tsc --noEmit"
   },

@@ -31,7 +31,7 @@ export async function runStandalonePrompts(
 	const { orm } = await prompt<{ orm: Preferences["orm"] }>({
 		type: "select",
 		name: "orm",
-		message: "Select ORM/Query Builder:",
+		message: "选择 ORM/查询构建器：",
 		choices: ["None", "Prisma", "Drizzle"],
 	});
 
@@ -43,7 +43,7 @@ export async function runStandalonePrompts(
 		const dbResult = await prompt<{ database: Preferences["database"] }>({
 			type: "select",
 			name: "database",
-			message: "Select DataBase for Prisma:",
+			message: "为 Prisma 选择数据库：",
 			choices: ["PostgreSQL", "MySQL", "MongoDB", "SQLite", "SQLServer", "CockroachDB"],
 		});
 		database = dbResult.database;
@@ -53,7 +53,7 @@ export async function runStandalonePrompts(
 		const dbResult = await prompt<{ database: "PostgreSQL" | "MySQL" | "SQLite" }>({
 			type: "select",
 			name: "database",
-			message: "Select DataBase for Drizzle:",
+			message: "为 Drizzle 选择数据库：",
 			choices: ["PostgreSQL", "MySQL", "SQLite"],
 		});
 		database = dbResult.database;
@@ -69,7 +69,7 @@ export async function runStandalonePrompts(
 		const driverResult = await prompt<{ driver: string }>({
 			type: "select",
 			name: "driver",
-			message: `Select driver for ${database}:`,
+			message: `为 ${database} 选择驱动：`,
 			choices: driversMap[database],
 		});
 		driver = driverResult.driver as Preferences["driver"];
@@ -78,7 +78,7 @@ export async function runStandalonePrompts(
 			const mockResult = await prompt<{ mockWithPGLite: boolean }>({
 				type: "toggle",
 				name: "mockWithPGLite",
-				message: "Do you want to mock database in tests with PGLite?",
+				message: "是否在测试中使用 PGLite 模拟数据库？",
 				initial: true,
 			});
 			mockWithPGLite = mockResult.mockWithPGLite;
@@ -89,7 +89,7 @@ export async function runStandalonePrompts(
 	const { plugins } = await prompt<{ plugins: Preferences["plugins"] }>({
 		type: "multiselect",
 		name: "plugins",
-		message: "Select Elysia plugins: (Space to select, Enter to continue)",
+		message: "选择 Elysia 插件：（空格选择，回车确认）",
 		choices: ["CORS", "Swagger", "JWT", "Autoload", "Oauth 2.0", "HTML/JSX", "Static", "Bearer", "Server Timing"],
 	});
 
@@ -97,14 +97,14 @@ export async function runStandalonePrompts(
 	const { telegramRelated } = await prompt<{ telegramRelated: boolean }>({
 		type: "toggle",
 		name: "telegramRelated",
-		message: "Is your project related to Telegram?",
+		message: "项目是否与 Telegram 相关？",
 		initial: false,
 	});
 
 	const { others } = await prompt<{ others: string[] }>({
 		type: "multiselect",
 		name: "others",
-		message: "Select others tools: (Space to select, Enter to continue)",
+		message: "选择其他工具：（空格选择，回车确认）",
 		choices: ["S3", "Posthog", "Jobify", "Husky"],
 	});
 
@@ -113,7 +113,7 @@ export async function runStandalonePrompts(
 		const s3Result = await prompt<{ s3Client: string }>({
 			type: "select",
 			name: "s3Client",
-			message: "Select S3 client:",
+			message: "选择 S3 客户端：",
 			choices: ["Bun.S3Client", "@aws-sdk/client-s3"],
 		});
 		s3Client = s3Result.s3Client as Preferences["s3Client"];
@@ -126,7 +126,7 @@ export async function runStandalonePrompts(
 		const redisResult = await prompt<{ redis: boolean }>({
 			type: "toggle",
 			name: "redis",
-			message: "Do you want to use Redis?",
+			message: "是否使用 Redis？",
 			initial: true,
 		});
 		redis = redisResult.redis;
@@ -135,7 +135,7 @@ export async function runStandalonePrompts(
 	const { locks } = await prompt<{ locks: boolean }>({
 		type: "toggle",
 		name: "locks",
-		message: "Do you want to use Locks to prevent race conditions?",
+		message: "是否使用分布式锁（防止竞态条件）？",
 		initial: true,
 	});
 
@@ -143,21 +143,21 @@ export async function runStandalonePrompts(
 	const { linter } = await prompt<{ linter: Preferences["linter"] }>({
 		type: "select",
 		name: "linter",
-		message: "Select linters/formatters:",
+		message: "选择代码检查/格式化工具：",
 		choices: ["None", "ESLint", "Biome"],
 	});
 
 	const { docker } = await prompt<{ docker: boolean }>({
 		type: "toggle",
 		name: "docker",
-		message: "Create Dockerfile + docker-compose.yml?",
+		message: "是否创建 Dockerfile + docker-compose.yml？",
 		initial: true,
 	});
 
 	const { vscode } = await prompt<{ vscode: boolean }>({
 		type: "toggle",
 		name: "vscode",
-		message: "Create .vscode folder with settings and extensions?",
+		message: "是否创建 .vscode 配置文件夹？",
 		initial: true,
 	});
 
@@ -166,7 +166,7 @@ export async function runStandalonePrompts(
 		const gitResult = await prompt<{ git: boolean }>({
 			type: "toggle",
 			name: "git",
-			message: "Create an empty Git repository?",
+			message: "是否初始化 Git 仓库？",
 			initial: true,
 		});
 		git = gitResult.git;

@@ -4,8 +4,7 @@
  * 仅负责解析参数、检测环境、路由到对应的用
  */
 
-// import minimist from "minimist";
-var minimist = require('minimist')
+import minimist from "minimist";
 import { error, title, divider } from "./utils";
 import { detectPackageManager } from "./utils";
 import { detectMonorepo } from "./utils/monorepo-detector";
@@ -14,7 +13,7 @@ import { createStandalone, createNewMonorepo, addAppToMonorepo } from "./yong";
 
 process.on("unhandledRejection", async (err) => {
 	console.error(err);
-	error("Unhandled rejection detected. The process will be terminated.");
+	error("检测到未处理的 Promise 拒绝，进程将终止。");
 	process.exit(1);
 });
 
@@ -23,12 +22,12 @@ async function main() {
 	const dir = args._.at(0);
 
 	if (!dir) {
-		throw new Error("Specify the folder like this - bun create elysiajs dir-name");
+		throw new Error("请指定项目目录，例如：bun create elysiajs 项目名");
 	}
 
 	const packageManager = args.pm || detectPackageManager();
 	if (packageManager !== "bun") {
-		throw new Error("Currently only Bun is supported");
+		throw new Error("当前仅支持 Bun");
 	}
 
 	// 检测 monorepo 环境并获取上下文
