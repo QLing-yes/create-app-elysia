@@ -3,7 +3,7 @@
  * Monorepo 还是 Standalone 单体应用
  */
 
-import enquirer from 'enquirer';
+import enquirer from 'enquirer-esm';
 const { prompt } = enquirer;
 
 export interface ProjectTypeResult {

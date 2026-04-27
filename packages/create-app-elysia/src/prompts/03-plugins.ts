@@ -2,7 +2,7 @@
  * 步骤 3: 询问 Elysia 插件选择
  */
 
-import enquirer from 'enquirer';
+import enquirer from 'enquirer-esm';
 const { prompt } = enquirer; 
 import type { PreferencesType } from "../utils";
 

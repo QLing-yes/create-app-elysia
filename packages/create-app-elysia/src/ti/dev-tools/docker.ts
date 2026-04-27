@@ -4,23 +4,23 @@
 
 import dedent from "ts-dedent";
 import {
-	type Preferences,
-	pmExecuteMap,
-	pmInstallFrozenLockfile,
-	pmInstallFrozenLockfileProduction,
-	pmLockFilesMap,
-	pmRunMap,
+    type Preferences,
+    pmExecuteMap,
+    pmInstallFrozenLockfile,
+    pmInstallFrozenLockfileProduction,
+    pmLockFilesMap,
+    pmRunMap,
 } from "../../utils";
 
 const ormDockerCopy: Record<string, string> = {
-	Prisma: "COPY --from=prerelease /usr/src/app/prisma ./prisma",
-	Drizzle: dedent`
+    Prisma: "COPY --from=prerelease /usr/src/app/prisma ./prisma",
+    Drizzle: dedent`
     COPY --from=prerelease /usr/src/app/drizzle ./drizzle
     COPY --from=prerelease /usr/src/app/drizzle.config.ts .`,
 };
 
 function getDockerfileBun({ orm }: Preferences) {
-	return dedent /* Dockerfile */ `
+    return dedent /* Dockerfile */ `
 FROM oven/bun:${process.versions.bun ?? "1.2.5"} AS base
 WORKDIR /usr/src/app
 
@@ -55,7 +55,7 @@ ENTRYPOINT [ "bun", "start" ]`;
 }
 
 function getDockerfileNode({ packageManager, orm }: Preferences) {
-	return dedent /* Dockerfile */ `
+    return dedent /* Dockerfile */ `
 FROM node:${process?.versions?.node ?? "22.12"} AS base
 WORKDIR /usr/src/app
 
@@ -92,24 +92,24 @@ ENTRYPOINT [ "${pmRunMap[packageManager]}", "start" ]`;
 }
 
 export function getDockerfile(preferences: Preferences) {
-	if (preferences.packageManager === "bun") return getDockerfileBun(preferences);
-	return getDockerfileNode(preferences);
+    if (preferences.packageManager === "bun") return getDockerfileBun(preferences);
+    return getDockerfileNode(preferences);
 }
 
 export function getDockerCompose({
-	database,
-	redis,
-	projectName,
-	meta,
-	others,
+    database,
+    redis,
+    projectName,
+    meta,
+    others,
 }: Preferences) {
-	const volumes: string[] = [];
-	if (database === "PostgreSQL") volumes.push("postgres_data:");
-	if (redis) volumes.push("redis_data:");
-	if (others.includes("S3")) volumes.push("minio_data:");
+    const volumes: string[] = [];
+    if (database === "PostgreSQL") volumes.push("postgres_data:");
+    if (redis) volumes.push("redis_data:");
+    if (others.includes("S3")) volumes.push("minio_data:");
 
-	const services = [
-		`bot:
+    const services = [
+        `bot:
             container_name: ${projectName}-bot
             restart: unless-stopped
             build:
@@ -117,8 +117,8 @@ export function getDockerCompose({
                 dockerfile: Dockerfile
             environment:
                 - NODE_ENV=production`,
-		database === "PostgreSQL"
-			? `postgres:
+        database === "PostgreSQL"
+            ? `postgres:
             container_name: ${projectName}-postgres
             image: postgres:latest
             restart: unless-stopped
@@ -128,18 +128,18 @@ export function getDockerCompose({
                 - POSTGRES_DB=${projectName}
             volumes:
                 - postgres_data:/var/lib/postgresql/data`
-			: "",
-		redis
-			? `redis:
+            : "",
+        redis
+            ? `redis:
             container_name: ${projectName}-redis
             image: redis:latest
             command: [ "redis-server", "--maxmemory-policy", "noeviction" ]
             restart: unless-stopped
             volumes:
                 - redis_data:/data`
-			: "",
-		others.includes("S3")
-			? `minio:
+            : "",
+        others.includes("S3")
+            ? `minio:
             container_name: ${projectName}-minio
             image: minio/minio:latest
             command: [ "minio", "server", "/data", "--console-address", ":9001" ]
@@ -157,10 +157,10 @@ export function getDockerCompose({
                 interval: 5s
                 timeout: 5s
                 retries: 5`
-			: "",
-	];
+            : "",
+    ];
 
-	return dedent /* yaml */ `
+    return dedent /* yaml */ `
 services:
     ${services.filter(Boolean).join("\n")}
 volumes:
@@ -172,20 +172,20 @@ networks:
 }
 
 export function getDevelopmentDockerCompose({
-	database,
-	redis,
-	projectName,
-	meta,
-	others,
+    database,
+    redis,
+    projectName,
+    meta,
+    others,
 }: Preferences) {
-	const volumes: string[] = [];
-	if (database === "PostgreSQL") volumes.push("postgres_data:");
-	if (redis) volumes.push("redis_data:");
-	if (others.includes("S3")) volumes.push("minio_data:");
+    const volumes: string[] = [];
+    if (database === "PostgreSQL") volumes.push("postgres_data:");
+    if (redis) volumes.push("redis_data:");
+    if (others.includes("S3")) volumes.push("minio_data:");
 
-	const services = [
-		database === "PostgreSQL"
-			? `postgres:
+    const services = [
+        database === "PostgreSQL"
+            ? `postgres:
             container_name: ${projectName}-postgres
             image: postgres:latest
             restart: unless-stopped
@@ -197,9 +197,9 @@ export function getDevelopmentDockerCompose({
                 - 5432:5432
             volumes:
                 - postgres_data:/var/lib/postgresql/data`
-			: "",
-		redis
-			? `redis:
+            : "",
+        redis
+            ? `redis:
             container_name: ${projectName}-redis
             image: redis:latest
             command: [ "redis-server", "--maxmemory-policy", "noeviction" ]
@@ -208,9 +208,9 @@ export function getDevelopmentDockerCompose({
                 - 6379:6379
             volumes:
                 - redis_data:/data`
-			: "",
-		others.includes("S3")
-			? `minio:
+            : "",
+        others.includes("S3")
+            ? `minio:
             container_name: ${projectName}-minio
             image: minio/minio:latest
             command: [ "minio", "server", "/data", "--console-address", ":9001" ]
@@ -225,10 +225,10 @@ export function getDevelopmentDockerCompose({
                 interval: 5s
                 timeout: 5s
                 retries: 5`
-			: "",
-	];
+            : "",
+    ];
 
-	return dedent /* yaml */ `
+    return dedent /* yaml */ `
 services:
     ${services.filter(Boolean).join("\n")}
 volumes:

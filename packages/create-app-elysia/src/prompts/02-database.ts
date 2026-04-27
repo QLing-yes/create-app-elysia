@@ -3,7 +3,7 @@
  * 根据项目类型决定是否显示（Monorepo 跳过）
  */
 
-import enquirer from 'enquirer';
+import enquirer from 'enquirer-esm';
 const { prompt } = enquirer; 
 import type { PreferencesType } from "../utils";
 

@@ -4,7 +4,8 @@
  * 仅负责解析参数、检测环境、路由到对应的用
  */
 
-import minimist from "minimist";
+// import minimist from "minimist";
+var minimist = require('minimist')
 import { error, title, divider } from "./utils";
 import { detectPackageManager } from "./utils";
 import { detectMonorepo } from "./utils/monorepo-detector";

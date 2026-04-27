@@ -5,7 +5,7 @@
 import path from "node:path";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
-import enquirer from "enquirer";
+import enquirer from "enquirer-esm";
 import task from "tasuku";
 const { prompt } = enquirer;
 const execAsync = promisify(exec);

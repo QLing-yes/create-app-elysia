@@ -17,12 +17,13 @@
   },
   "scripts": {
     "dev": "bun run  src/index.ts  my-elysia-app",
-    "build": "pkgroll --minify",
+    "build": "bun build src/index.ts --outdir ./dist --format esm --target node",
+    "start": "bun run dist/index.js",
     "gen-types": "bun run scripts/01json2type.ts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "enquirer": "^2.4.1",
+    "enquirer-esm": "^2.3.6-ext.1",
     "minimist": "^1.2.8",
     "strip-json-comments": "^5.0.3",
     "tasuku": "^2.3.0",

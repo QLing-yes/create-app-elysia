@@ -4,7 +4,7 @@
  * 检测当前是否在 monorepo 环境中，并处理相关交互
  */
 
-import enquirer from 'enquirer';
+import enquirer from 'enquirer-esm';
 import path from "node:path";
 const { prompt } = enquirer;
 
