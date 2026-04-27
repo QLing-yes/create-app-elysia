@@ -18,6 +18,7 @@
   "scripts": {
     "dev": "bun run  src/index.ts  my-elysia-app",
     "build": "pkgroll --minify",
+    "gen-types": "bun run scripts/01json2type.ts",
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
@@ -34,5 +35,8 @@
     "typescript": {
       "optional": true
     }
+  },
+  "devDependencies": {
+    "quicktype": "^23.2.6"
   }
 }

@@ -24,6 +24,9 @@
         "tasuku": "^2.3.0",
         "ts-dedent": "^2.2.0",
       },
+      "devDependencies": {
+        "quicktype": "^23.2.6",
+      },
       "peerDependencies": {
         "typescript": ">=4.5.0",
       },

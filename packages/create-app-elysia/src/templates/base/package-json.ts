@@ -1,4 +1,5 @@
-import { dependencies } from "../../deps";
+import { dependencies, devDependencies } from "../../deps";
+import type { Dependencies, DevDependencies } from "../../dependency/types";
 import { type Preferences, pmExecuteMap, pmRunMap } from "../../utils";
 
 /**
@@ -39,46 +40,46 @@ export function getPackageJson({
     dependencies: {
       elysia: dependencies.elysia,
       "env-var": dependencies["env-var"],
-    } as Record<keyof typeof dependencies, string>,
+    } as Partial<Dependencies>,
     devDependencies: {
-      typescript: dependencies.typescript,
-    } as Record<keyof typeof dependencies, string>,
+      typescript: devDependencies.typescript,
+    } as Partial<DevDependencies>,
   };
 
   // 添加 Bun 类型定义
-  sample.devDependencies["@types/bun"] = dependencies["@types/bun"];
+  sample.devDependencies["@types/bun"] = devDependencies["@types/bun"];
 
   // 配置 Biome 代码检查工具
   if (linter === "Biome") {
     sample.scripts.lint = `${pmExecuteMap[packageManager]} @biomejs/biome check src`;
     sample.scripts["lint:fix"] = `${pmRunMap[packageManager]} lint --write`;
-    sample.devDependencies["@biomejs/biome"] = dependencies["@biomejs/biome"];
+    sample.devDependencies["@biomejs/biome"] = devDependencies["@biomejs/biome"];
   }
   // 配置 ESLint 代码检查工具
   if (linter === "ESLint") {
     sample.scripts.lint = `${pmExecuteMap[packageManager]} eslint`;
     sample.scripts["lint:fix"] = `${pmExecuteMap[packageManager]} eslint --fix`;
-    sample.devDependencies.eslint = dependencies.eslint;
+    sample.devDependencies.eslint = devDependencies.eslint;
     sample.devDependencies["@antfu/eslint-config"] =
-      dependencies["@antfu/eslint-config"];
+      devDependencies["@antfu/eslint-config"];
     // 如果使用 Drizzle，添加其 ESLint 插件
     if (orm === "Drizzle")
       sample.devDependencies["eslint-plugin-drizzle"] =
-        dependencies["eslint-plugin-drizzle"];
+        devDependencies["eslint-plugin-drizzle"];
   }
 
   // 配置 Prisma ORM
   if (orm === "Prisma") {
-    sample.devDependencies.prisma = dependencies.prisma;
+    sample.devDependencies.prisma = devDependencies.prisma;
     sample.dependencies["@prisma/client"] = dependencies["@prisma/client"];
   }
   // 配置 Drizzle ORM 及其驱动
   if (orm === "Drizzle") {
     sample.dependencies["drizzle-orm"] = dependencies["drizzle-orm"];
-    sample.devDependencies["drizzle-kit"] = dependencies["drizzle-kit"];
+    sample.devDependencies["drizzle-kit"] = devDependencies["drizzle-kit"];
     if (driver === "node-postgres") {
       sample.dependencies.pg = dependencies.pg;
-      sample.devDependencies["@types/pg"] = dependencies["@types/pg"];
+      sample.devDependencies["@types/pg"] = devDependencies["@types/pg"];
     }
     if (driver === "Postgres.JS") {
       sample.dependencies.postgres = dependencies.postgres;
@@ -95,7 +96,7 @@ export function getPackageJson({
 
   // 配置 Husky Git Hooks
   if (others.includes("Husky")) {
-    sample.devDependencies.husky = dependencies.husky;
+    sample.devDependencies.husky = devDependencies.husky;
     sample.scripts.prepare = "husky";
   }
 
@@ -135,7 +136,7 @@ export function getPackageJson({
   if (redis) {
     sample.dependencies.ioredis = dependencies.ioredis;
     if (mockWithPGLite)
-      sample.devDependencies["ioredis-mock"] = dependencies["ioredis-mock"];
+      sample.devDependencies["ioredis-mock"] = devDependencies["ioredis-mock"];
   }
 
   // 任务队列依赖
@@ -167,8 +168,8 @@ export function getPackageJson({
   // 测试模拟依赖
   if (mockWithPGLite) {
     sample.devDependencies["@electric-sql/pglite"] =
-      dependencies["@electric-sql/pglite"];
-    sample.devDependencies["@elysiajs/eden"] = dependencies["@elysiajs/eden"];
+      devDependencies["@electric-sql/pglite"];
+    sample.devDependencies["@elysiajs/eden"] = devDependencies["@elysiajs/eden"];
   }
 
   // Telegram Bot 依赖
