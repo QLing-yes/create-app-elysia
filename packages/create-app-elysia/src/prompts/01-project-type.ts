@@ -4,7 +4,7 @@
  */
 
 import enquirer from 'enquirer';
-const { prompt } = enquirer; 
+const { prompt } = enquirer;
 
 export interface ProjectTypeResult {
   isMonorepo: boolean;
@@ -12,7 +12,7 @@ export interface ProjectTypeResult {
 
 /**
  * 询问用户项目类型
- * 
+ *
  * @returns 项目类型选择结果
  */
 export async function askProjectType(): Promise<ProjectTypeResult> {
@@ -21,6 +21,20 @@ export async function askProjectType(): Promise<ProjectTypeResult> {
     name: "isMonorepo",
     message: "Is this a monorepo? (Monorepo will have simplified configuration)",
     initial: false,
+  });
+
+  return { isMonorepo };
+}
+
+
+export async function useFramework(): Promise<ProjectTypeResult> {
+  const { isMonorepo } = await prompt<{ isMonorepo: boolean }>({
+    type: "select",
+    name: "选择框架",
+    message: 'Please provide the following information:',
+    choices: [
+      { name: 'next', message: '使用 next +elysia' },
+    ]
   });
 
   return { isMonorepo };

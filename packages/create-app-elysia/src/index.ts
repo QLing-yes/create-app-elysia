@@ -4,16 +4,18 @@
  *
  * 第四层：执行主控层
  * 负责串联所有层级，实现项目生成流程
- * 
+ *
  * 流程顺序：
  * 1. 解析命令行参数
- * 2. 检测包管理器
- * 3. 创建项目目录
+ * 2. 检测包管理器和 monorepo 环境
+ * 3. 根据环境分支处理
+ *    - Monorepo 内创建新 app
+ *    - 创建新 Monorepo
+ *    - 创建 Standalone 项目
  * 4. 漏斗式交互收集用户偏好
- * 5. 生成基础文件（总是生成）
- * 6. 条件生成文件（根据用户选择）
- * 7. 安装依赖
- * 8. 完成提示
+ * 5. 生成文件
+ * 6. 安装依赖
+ * 7. 完成提示
  */
 
 import fs from "node:fs/promises";
@@ -24,7 +26,7 @@ import dedent from "ts-dedent";
 import { exec } from "node:child_process";
 import { promisify } from "node:util";
 import enquirer from 'enquirer';
-const { prompt } = enquirer; 
+const { prompt } = enquirer;
 
 // ========== 第一层：工具层 ==========
 import {
@@ -41,9 +43,13 @@ import {
   divider,
   step,
 } from "./utils/index";
+import { detectMonorepo, getMonorepoWorkspaces } from "./utils/monorepo-detector";
 
 // ========== 第二层：交互层 ==========
 import {
+  askMonorepoContext,
+  askMonorepoLocation,
+  askMonorepoName,
   askProjectType,
   askDatabase,
   askPlugins,
@@ -82,6 +88,25 @@ import {
   getBotFile,
   getInstallCommands,
   getEnvFile,
+  // Monorepo 模板
+  getMonorepoRootPackageJson,
+  getTurboJson,
+  getWorkspacePackageJson,
+  getMonorepoAppPackageJson,
+  getMonorepoRootTsConfig,
+  getContractIndex,
+  getContractPackageJson,
+  getTsConfigPackage,
+  getBaseTsConfig,
+  getMonorepoGitignore,
+  getMonorepoReadme,
+  // Monorepo App 模板
+  getMonorepoNewAppPackageJson,
+  getMonorepoAppServer,
+  getMonorepoAppTsConfig,
+  getMonorepoAppBiomeConfig,
+  getMonorepoAppGitignore,
+  getMonorepoAppReadme,
 } from "./templates";
 
 // ========== 辅助函数 ==========
@@ -112,22 +137,337 @@ async function main() {
     throw new Error("Currently only Bun is supported");
   }
 
+  const runtime: "Bun" | "Node.js" = packageManager === "bun" ? "Bun" : "Node.js";
+
+  // 3. 检测 monorepo 环境
+  const monorepoResult = await detectMonorepo(process.cwd());
+
+  // 4. Monorepo 上下文处理
+  title("🚀 Create Elysia App");
+  divider();
+  step("Collecting preferences...");
+
+  const monorepoContext = await askMonorepoContext(
+    monorepoResult.isMonorepo,
+    monorepoResult.rootPath
+  );
+
+  // ========== 分支 1: 在现有 monorepo 中创建新 app ==========
+  if (monorepoContext.isMonorepo && !monorepoContext.createNewMonorepo && monorepoContext.monorepoRoot) {
+    await createInExistingMonorepo(
+      monorepoContext.monorepoRoot,
+      monorepoResult.workspaces,
+      packageManager,
+      runtime
+    );
+    return;
+  }
+
+  // ========== 分支 2: 创建新的 Monorepo ==========
+  if (monorepoContext.isMonorepo && monorepoContext.createNewMonorepo) {
+    await createNewMonorepo(dir, packageManager, runtime, args);
+    return;
+  }
+
+  // ========== 分支 3: 创建 Standalone 项目 ==========
+  await createStandaloneProject(dir, packageManager, runtime, args);
+}
+
+// 启动主函数
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
+
+// ========== 功能函数 ==========
+
+/**
+ * 创建新的 Monorepo 项目
+ */
+async function createNewMonorepo(
+  dir: string,
+  packageManager: string,
+  runtime: "Bun" | "Node.js",
+  args: Record<string, unknown>
+) {
   const projectDir = resolvePath(dir);
   const projectName = path.basename(projectDir);
 
-  // 3. 创建项目目录
-  await createOrFindDir(projectDir);
+  // 询问 monorepo 名称
+  const monorepoName = await askMonorepoName();
 
-  // 4. 漏斗式交互收集用户偏好
-  title("🚀 Create Elysia App");
+  // 检查目录是否为空
+  await checkAndClearDirectory(projectDir, projectName);
+
   divider();
 
-  step("Collecting preferences...");
+  // 生成 Monorepo 根目录文件
+  await task("Generating monorepo structure...", async ({ setTitle }) => {
+    step("Writing root files...");
+
+    // 根目录 package.json
+    await writeFile(
+      joinPath(projectDir, "package.json"),
+      getMonorepoRootPackageJson(monorepoName)
+    );
+
+    // turbo.json
+    await writeFile(joinPath(projectDir, "turbo.json"), getTurboJson());
+
+    // tsconfig.json
+    await writeFile(
+      joinPath(projectDir, "tsconfig.json"),
+      getMonorepoRootTsConfig()
+    );
+
+    // .gitignore
+    await writeFile(joinPath(projectDir, ".gitignore"), getMonorepoGitignore());
+
+    // README.md
+    await writeFile(
+      joinPath(projectDir, "README.md"),
+      getMonorepoReadme(monorepoName)
+    );
+
+    // biome.json (根目录代码质量配置)
+    await writeFile(
+      joinPath(projectDir, "biome.json"),
+      JSON.stringify(
+        {
+          $schema: "https://biomejs.dev/schemas/2.2.3/schema.json",
+          formatter: {
+            enabled: true,
+            indentStyle: "space",
+            indentWidth: 2,
+          },
+          linter: {
+            enabled: true,
+            rules: {
+              recommended: true,
+            },
+          },
+        },
+        null,
+        2
+      )
+    );
+
+    // 创建 packages/contract
+    step("Writing packages/contract...");
+    const contractDir = joinPath(projectDir, "packages", "contract", "src");
+    await createOrFindDir(contractDir);
+    await writeFile(
+      joinPath(projectDir, "packages/contract/package.json"),
+      getContractPackageJson()
+    );
+    await writeFile(
+      joinPath(projectDir, "packages/contract/src/index.ts"),
+      getContractIndex()
+    );
+    await writeFile(
+      joinPath(projectDir, "packages/contract/tsconfig.json"),
+      JSON.stringify(
+        {
+          extends: "@repo/tsconfig/base.json",
+          compilerOptions: {
+            module: "ESNext",
+            moduleResolution: "bundler",
+            noEmit: true,
+            skipLibCheck: true,
+          },
+          include: ["src/**/*"],
+          exclude: ["node_modules", "dist"],
+        },
+        null,
+        2
+      )
+    );
+
+    // 创建 packages/tsconfig
+    step("Writing packages/tsconfig...");
+    const tsconfigDir = joinPath(projectDir, "packages", "tsconfig");
+    await createOrFindDir(tsconfigDir);
+    await writeFile(
+      joinPath(projectDir, "packages/tsconfig/package.json"),
+      getTsConfigPackage()
+    );
+    await writeFile(
+      joinPath(projectDir, "packages/tsconfig/base.json"),
+      getBaseTsConfig()
+    );
+
+    // 创建 apps/api (Elysia 后端)
+    step("Writing apps/api...");
+    const apiDir = joinPath(projectDir, "apps", "api", "src");
+    await createOrFindDir(apiDir);
+    await writeFile(
+      joinPath(projectDir, "apps/api/package.json"),
+      getMonorepoAppPackageJson("api")
+    );
+    await writeFile(
+      joinPath(projectDir, "apps/api/src/server.ts"),
+      getMonorepoAppServer("api")
+    );
+    await writeFile(
+      joinPath(projectDir, "apps/api/tsconfig.json"),
+      getMonorepoAppTsConfig()
+    );
+    await writeFile(
+      joinPath(projectDir, "apps/api/biome.json"),
+      getMonorepoAppBiomeConfig()
+    );
+    await writeFile(
+      joinPath(projectDir, "apps/api/.gitignore"),
+      getMonorepoAppGitignore()
+    );
+    await writeFile(
+      joinPath(projectDir, "apps/api/README.md"),
+      getMonorepoAppReadme("api")
+    );
+
+    setTitle("✅ Monorepo structure is complete!");
+  });
+
+  // 安装依赖
+  const noInstall = !Boolean(args.install ?? true);
+  if (!noInstall) {
+    await task("Installing dependencies...", async () => {
+      await execAsync("bun install", { cwd: projectDir }).catch((e) =>
+        console.error(e)
+      );
+    });
+  }
+
+  // 完成提示
+  divider();
+  success("🎉 Monorepo created successfully!");
+  divider();
+
+  console.log(`
+📁 Project location: ${projectDir}
+
+🚀 Next steps:
+   cd ${dir}
+   bun run dev
+
+📦 Structure:
+   apps/api/     - Elysia backend
+   packages/contract - Shared schemas
+   packages/tsconfig - Shared TS config
+
+💡 Run specific app:
+   bun run dev --filter=api
+`);
+
+  printFormatHint(packageManager);
+}
+
+/**
+ * 在现有 monorepo 中创建新的 app
+ */
+async function createInExistingMonorepo(
+  monorepoRoot: string,
+  workspaces: string[],
+  packageManager: string,
+  runtime: "Bun" | "Node.js"
+) {
+  // 获取现有的 workspaces
+  const ws = await getMonorepoWorkspaces(monorepoRoot, workspaces);
+
+  // 询问创建位置
+  const location = await askMonorepoLocation(
+    monorepoRoot,
+    ws.apps,
+    ws.packages
+  );
+
+  divider();
+
+  // 生成 app 文件
+  await task("Creating new app in monorepo...", async ({ setTitle }) => {
+    step(`Writing ${location.locationType}/${location.projectName}...`);
+
+    const appDir = location.fullPath;
+
+    // 创建目录
+    await createOrFindDir(joinPath(appDir, "src"));
+
+    // package.json
+    await writeFile(
+      joinPath(appDir, "package.json"),
+      getMonorepoNewAppPackageJson(location.projectName)
+    );
+
+    // server.ts
+    await writeFile(
+      joinPath(appDir, "src/server.ts"),
+      getMonorepoAppServer(location.projectName)
+    );
+
+    // tsconfig.json
+    await writeFile(
+      joinPath(appDir, "tsconfig.json"),
+      getMonorepoAppTsConfig()
+    );
+
+    // biome.json
+    await writeFile(
+      joinPath(appDir, "biome.json"),
+      getMonorepoAppBiomeConfig()
+    );
+
+    // .gitignore
+    await writeFile(
+      joinPath(appDir, ".gitignore"),
+      getMonorepoAppGitignore()
+    );
+
+    // README.md
+    await writeFile(
+      joinPath(appDir, "README.md"),
+      getMonorepoAppReadme(location.projectName)
+    );
+
+    setTitle(`✅ App ${location.projectName} created!`);
+  });
+
+  // 完成提示
+  divider();
+  success(`🎉 App created in monorepo!`);
+  divider();
+
+  const relativePath = path.relative(monorepoRoot, location.fullPath);
+  console.log(`
+📁 App location: ${relativePath}
+
+🚀 Next steps:
+   cd ${relativePath}
+   bun run dev
+
+💡 Run from monorepo root:
+   bun run dev --filter=${location.projectName}
+`);
+
+  printFormatHint(packageManager);
+}
+
+/**
+ * 创建 Standalone 项目（原有逻辑）
+ */
+async function createStandaloneProject(
+  dir: string,
+  packageManager: string,
+  runtime: "Bun" | "Node.js",
+  args: Record<string, unknown>
+) {
+  const projectDir = resolvePath(dir);
+  const projectName = path.basename(projectDir);
+
+  // 创建项目目录
+  await createOrFindDir(projectDir);
 
   // 4.1 项目类型选择
   const { isMonorepo } = await askProjectType();
-
-  const runtime: "Bun" | "Node.js" = packageManager === "bun" ? "Bun" : "Node.js";
 
   // 4.2 数据库配置（Monorepo 跳过）
   const dbConfig = await askDatabase(isMonorepo, runtime);
@@ -148,7 +488,7 @@ async function main() {
   const preferences = new Preferences();
   preferences.dir = dir;
   preferences.projectName = projectName;
-  preferences.packageManager = packageManager;
+  preferences.packageManager = packageManager as "bun";
   preferences.runtime = runtime;
   preferences.isMonorepo = isMonorepo;
 
@@ -177,27 +517,7 @@ async function main() {
   preferences.noInstall = !Boolean(args.install ?? true);
 
   // 6. 检查目录是否为空，如果不为空则询问是否覆盖
-  const filesInTargetDirectory = await fs
-    .readdir(projectDir)
-    .catch(() => []);
-  if (filesInTargetDirectory.length) {
-    const { overwrite } = await prompt<{ overwrite: boolean }>({
-      type: "toggle",
-      name: "overwrite",
-      message: `\n${filesInTargetDirectory.join(
-        "\n"
-      )}\n\nThe directory ${projectName} is not empty. Do you want to delete the files?`,
-      initial: true,
-    });
-
-    if (!overwrite) {
-      info("Cancelled...");
-      process.exit(0);
-    }
-
-    await fs.rm(projectDir, { recursive: true });
-    await createOrFindDir(projectDir);
-  }
+  await checkAndClearDirectory(projectDir, projectName);
 
   divider();
 
@@ -444,7 +764,7 @@ async function main() {
 
 💡 Tip: To format your code, run one of the following commands after installation:
    bun run lint:fix
-   
+
    Or with ultracite:
    npx ultracite init
    npx ultracite fix
@@ -453,8 +773,32 @@ async function main() {
   printFormatHint(packageManager);
 }
 
-// 启动主函数
-main().catch((err) => {
-  console.error(err);
-  process.exit(1);
-});
+/**
+ * 检查目录是否为空，如果不为空则询问是否覆盖
+ */
+async function checkAndClearDirectory(
+  projectDir: string,
+  projectName: string
+) {
+  const filesInTargetDirectory = await fs
+    .readdir(projectDir)
+    .catch(() => []);
+  if (filesInTargetDirectory.length) {
+    const { overwrite } = await prompt<{ overwrite: boolean }>({
+      type: "toggle",
+      name: "overwrite",
+      message: `\n${filesInTargetDirectory.join(
+        "\n"
+      )}\n\nThe directory ${projectName} is not empty. Do you want to delete the files?`,
+      initial: true,
+    });
+
+    if (!overwrite) {
+      info("Cancelled...");
+      process.exit(0);
+    }
+
+    await fs.rm(projectDir, { recursive: true });
+    await createOrFindDir(projectDir);
+  }
+}

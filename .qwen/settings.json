@@ -3,7 +3,11 @@
     "allow": [
       "Bash(mkdir *)",
       "Bash(move *)",
-      "Bash(bun *)"
+      "Bash(bun *)",
+      "Read(L:\\Documents\\GitHub\\mono-elysia-next/**)",
+      "Read(L:\\Documents\\GitHub\\mono-elysia-next\\apps/**)",
+      "Read(L:\\Documents\\GitHub\\mono-elysia-next\\packages/**)",
+      "Read(L:\\Documents\\GitHub\\mono-elysia-next\\packages\\contract/**)"
     ]
   },
   "$version": 3

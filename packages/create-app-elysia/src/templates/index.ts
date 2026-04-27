@@ -3,12 +3,14 @@
  * 第三层：模板与生成层
  *
  * 目录结构：
- * - base/     基础配置 (package.json, tsconfig.json 等)
- * - core/     核心代码 (server.ts, index.ts, config.ts)
- * - db/       数据库相关 (Prisma, Drizzle)
- * - services/ 服务层 (Redis, S3, Posthog 等)
- * - dev/      开发工具 (ESLint, Docker, VSCode)
- * - tests/    测试相关
+ * - base/       基础配置 (package.json, tsconfig.json 等)
+ * - core/       核心代码 (server.ts, index.ts, config.ts)
+ * - db/         数据库相关 (Prisma, Drizzle)
+ * - services/   服务层 (Redis, S3, Posthog 等)
+ * - dev/        开发工具 (ESLint, Docker, VSCode)
+ * - tests/      测试相关
+ * - monorepo/   Monorepo 相关模板
+ * - monorepo-app/ 在现有 monorepo 中添加 app 的模板
  */
 
 // ========== 基础配置 ==========
@@ -45,3 +47,32 @@ export { getPreloadFile, getTestsAPIFile, getTestsIndex, getTestSharedFile } fro
 export { getBotFile } from "./bot";
 export { getInstallCommands } from "./install";
 export { getEnvFile } from "./core/env";
+
+// ========== Monorepo 模板 ==========
+export {
+  getMonorepoRootPackageJson,
+} from "./monorepo/root-package-json";
+export { getTurboJson } from "./monorepo/turbo-json";
+export {
+  getWorkspacePackageJson,
+  getMonorepoAppPackageJson,
+} from "./monorepo/workspace-package-json";
+export { getMonorepoRootTsConfig } from "./monorepo/root-tsconfig";
+export {
+  getContractIndex,
+  getContractPackageJson,
+} from "./monorepo/contract-package";
+export {
+  getTsConfigPackage,
+  getBaseTsConfig,
+} from "./monorepo/tsconfig-package";
+export { getMonorepoGitignore } from "./monorepo/gitignore";
+export { getMonorepoReadme } from "./monorepo/readme";
+
+// ========== Monorepo App 模板 ==========
+export { getMonorepoNewAppPackageJson } from "./monorepo-app/app-package-json";
+export { getMonorepoAppServer } from "./monorepo-app/app-server";
+export { getMonorepoAppTsConfig } from "./monorepo-app/app-tsconfig";
+export { getMonorepoAppBiomeConfig } from "./monorepo-app/app-biome-json";
+export { getMonorepoAppGitignore } from "./monorepo-app/app-gitignore";
+export { getMonorepoAppReadme } from "./monorepo-app/app-readme";

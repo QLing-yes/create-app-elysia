@@ -15,5 +15,6 @@
   "workspaces": [
     "packages/*"
   ],
-  "type": "module"
+  "type": "module",
+  "module": "index.ts"
 }
