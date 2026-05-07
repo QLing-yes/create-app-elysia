@@ -6,24 +6,29 @@
 import type { Preferences } from "../utils";
 
 export function getInstallCommands({
-	linter,
-	orm,
-	database,
-	git,
-	others,
+  formatter,
+  orm,
+  database,
+  git,
+  husky,
 }: Preferences) {
-	const commands: string[] = [];
+  const commands: string[] = [];
 
-	if (git) commands.push("git init");
-	commands.push("bun install");
-	if (others.includes("Husky") && linter !== "None")
-		commands.push(`echo "bun lint:fix" > .husky/pre-commit`);
-	if (orm === "Prisma")
-		commands.push(
-			`bunx prisma init --datasource-provider ${database.toLowerCase()}`,
-		);
-	if (linter === "Biome") commands.push("bunx @biomejs/biome init");
-	if (linter !== "None") commands.push("bun lint:fix");
+  if (git) commands.push("git init");
+  commands.push("bun install");
 
-	return commands;
+  if (husky && formatter !== "none") {
+    commands.push(`echo "bun lint:fix" > .husky/pre-commit`);
+  }
+
+  if (orm === "Prisma") {
+    commands.push(
+      `bunx prisma init --datasource-provider ${database.toLowerCase()}`,
+    );
+  }
+
+  if (formatter === "biome") commands.push("bunx @biomejs/biome init");
+  if (formatter === "eslint") commands.push("bun lint:fix");
+
+  return commands;
 }

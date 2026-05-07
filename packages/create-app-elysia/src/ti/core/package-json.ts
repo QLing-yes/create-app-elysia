@@ -14,7 +14,7 @@ import type { Dependencies, DevDependencies } from "../dependency/types";
 export function getPackageJson({
 	dir,
 	projectName,
-	linter,
+	formatter,
 	packageManager,
 	orm,
 	driver,
@@ -25,6 +25,7 @@ export function getPackageJson({
 	mockWithPGLite,
 	telegramRelated,
 	s3Client,
+		husky,
 }: Preferences) {
 	const sample = {
 		name: projectName,
@@ -54,13 +55,13 @@ export function getPackageJson({
 	sample.devDependencies["@types/bun"] = devDependencies["@types/bun"];
 
 	// Linter
-	if (linter === "Biome") {
+	if (formatter === "biome") {
 		sample.scripts.lint = `${pmExecuteMap[packageManager]} @biomejs/biome check src`;
 		sample.scripts["lint:fix"] = `${pmRunMap[packageManager]} lint --write`;
 		sample.devDependencies["@biomejs/biome"] = devDependencies["@biomejs/biome"];
 	}
   // 配置 ESLint 代码检查工具
-	if (linter === "ESLint") {
+	if (formatter === "eslint") {
 		sample.scripts.lint = `${pmExecuteMap[packageManager]} eslint`;
 		sample.scripts["lint:fix"] = `${pmExecuteMap[packageManager]} eslint --fix`;
 		sample.devDependencies.eslint = devDependencies.eslint;
@@ -99,7 +100,7 @@ export function getPackageJson({
 	}
 
 	// Husky
-	if (others.includes("Husky")) {
+	if (husky) {
     sample.devDependencies.husky = devDependencies.husky;
 		sample.scripts.prepare = "husky";
 	}

@@ -19,13 +19,8 @@ export async function askFormatter(isMonorepo: boolean): Promise<FormatterResult
     type: "select",
     name: "formatter",
     message: "选择格式化工具：",
-    choices: [
-      { name: "ultracite", message: "ultracite（推荐）", hint: "零配置，极速" },
-      { name: "biome", message: "Biome" },
-      { name: "eslint", message: "ESLint" },
-      { name: "none", message: "None" },
-    ],
-    initial: "ultracite",
+    choices: ["ultracite", "biome", "eslint", "none"],
+    initial: 0,
   });
 
   return { formatter };
