@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `create-app-elysia` is a CLI scaffolding tool for bootstrapping ElysiaJS projects with interactive prompts. It's published as an npm package (`create-elysiajs`) and follows a 体用 (Ti-Yong) architecture.
 
+## 创建添加cli的时候，要一个模板的加，不要一次添加两种模板，这样会里不清楚
+
 ### Architecture
 
 ```

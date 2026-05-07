@@ -46,7 +46,7 @@ export type ElysiaPlugin =
   | "Server Timing";
 
 // 集成工具类型
-export type IntegrationTool = "S3" | "Husky" | "Posthog" | "Jobify";
+export type IntegrationTool = "S3" | "Posthog" | "Jobify";
 
 // S3 客户端类型
 export type S3ClientType = "Bun.S3Client" | "@aws-sdk/client-s3" | "None";
@@ -68,6 +68,8 @@ export interface PartialPreferences {
   locks?: boolean;
   telegramRelated?: boolean;
   mockWithPGLite?: boolean;
+  husky?: boolean;
+  formatter?: "ultracite" | "biome" | "eslint" | "none";
 }
 
 // 完整的 Preferences 类型引用

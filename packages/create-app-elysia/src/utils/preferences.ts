@@ -77,8 +77,11 @@ export class Preferences {
   // Telegram 集成
   telegramRelated = false;
 
-  // 格式化配置（由用户手动执行）
-  formatOnFinish = false;
+  // Husky (Git hooks)
+  husky = false;
+
+  // 格式化工具
+  formatter: "ultracite" | "biome" | "eslint" | "none" = "ultracite";
 }
 
 /**
