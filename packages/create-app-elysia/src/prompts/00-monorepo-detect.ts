@@ -48,7 +48,7 @@ export async function askMonorepoContext(
     const { createInMonorepo } = await prompt<{ createInMonorepo: boolean }>({
       type: "toggle",
       name: "createInMonorepo",
-      message: `Monorepo detected at ${monorepoRoot}. Create a new project inside this monorepo?`,
+      message: `检测到 Monorepo（${monorepoRoot}）。是否在此 Monorepo 中创建新项目？`,
       initial: true,
     });
 
@@ -64,7 +64,7 @@ export async function askMonorepoContext(
     const { createNew } = await prompt<{ createNew: boolean }>({
       type: "toggle",
       name: "createNew",
-      message: "Do you want to create a new monorepo instead?",
+      message: "是否要创建一个新的 Monorepo？",
       initial: false,
     });
 
@@ -79,17 +79,17 @@ export async function askMonorepoContext(
   const { projectType } = await prompt<{ projectType: string }>({
     type: "select",
     name: "projectType",
-    message: "What type of project do you want to create?",
+    message: "你想创建什么类型的项目？",
     choices: [
       {
         name: "standalone",
-        message: "Standalone (Single project)",
-        hint: "A single Elysia project",
+        message: "独立项目 (Standalone)",
+        hint: "单个 Elysia 项目",
       },
       {
         name: "monorepo",
-        message: "Monorepo (Multiple projects)",
-        hint: "A monorepo with Next.js + Elysia",
+        message: "Monorepo（多项目仓库）",
+        hint: "包含 Next.js + Elysia 的 Monorepo",
       },
     ],
   });
@@ -113,25 +113,25 @@ export async function askMonorepoLocation(
   const choices = [
     {
       name: "apps",
-      message: "apps/ (Frontend/Full-stack applications)",
-      hint: `${existingApps.length} existing apps`,
+      message: "apps/（前端/全栈应用）",
+      hint: `${existingApps.length} 个现有应用`,
     },
     {
       name: "packages",
-      message: "packages/ (Shared libraries/packages)",
-      hint: `${existingPackages.length} existing packages`,
+      message: "packages/（共享库/包）",
+      hint: `${existingPackages.length} 个现有包`,
     },
     {
       name: "custom",
-      message: "Custom location",
-      hint: "Specify a custom path",
+      message: "自定义位置 (Custom)",
+      hint: "指定自定义路径",
     },
   ];
 
   const { locationType } = await prompt<{ locationType: "apps" | "packages" | "custom" }>({
     type: "select",
     name: "locationType",
-    message: "Where do you want to create the new project?",
+    message: "你想在哪里创建新项目？",
     choices,
   });
 
@@ -139,14 +139,14 @@ export async function askMonorepoLocation(
   const { projectName } = await prompt<{ projectName: string }>({
     type: "input",
     name: "projectName",
-    message: "Enter the project name:",
+    message: "请输入项目名称：",
     initial: locationType === "apps" ? "web" : "shared",
     validate: (value: string) => {
       if (!value.trim()) {
-        return "Project name is required";
+        return "项目名称不能为空";
       }
       if (!/^[a-z0-9_-]+$/.test(value)) {
-        return "Project name can only contain lowercase letters, numbers, hyphens, and underscores";
+        return "项目名称只能包含小写字母、数字、连字符和下划线";
       }
       return true;
     },
@@ -158,7 +158,7 @@ export async function askMonorepoLocation(
     const { customPath } = await prompt<{ customPath: string }>({
       type: "input",
       name: "customPath",
-      message: "Enter the custom path (relative to monorepo root):",
+      message: "请输入自定义路径（相对于 Monorepo 根目录）：",
       initial: "apps/my-app",
     });
     fullPath = path.join(monorepoRoot, customPath);
@@ -180,14 +180,14 @@ export async function askMonorepoName(): Promise<string> {
   const { name } = await prompt<{ name: string }>({
     type: "input",
     name: "name",
-    message: "Enter the monorepo name:",
+    message: "请输入 Monorepo 名称：",
     initial: "my-monorepo",
     validate: (value: string) => {
       if (!value.trim()) {
-        return "Monorepo name is required";
+        return "Monorepo 名称不能为空";
       }
       if (!/^[a-z0-9_-]+$/.test(value)) {
-        return "Name can only contain lowercase letters, numbers, hyphens, and underscores";
+        return "名称只能包含小写字母、数字、连字符和下划线";
       }
       return true;
     },
