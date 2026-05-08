@@ -10,8 +10,8 @@
 import minimist from "minimist";
 import { error, title, divider, detectPackageManager } from "./utils";
 import { detectMonorepo } from "./utils/monorepo-detector";
-import { askProjectType } from "./prompts/00-monorepo-detect";
-import { createStandalone, createNewMonorepo, addAppToMonorepo, createProProject } from "./yong";
+import { askProjectType, askAppType } from "./prompts/00-monorepo-detect";
+import { createStandalone, createNewMonorepo, addAppToMonorepo, createProProject, addProToMonorepo } from "./yong";
 
 process.on("unhandledRejection", async (err) => {
   console.error(err);
@@ -39,7 +39,12 @@ async function main() {
 
   if (monorepoResult.isMonorepo && monorepoResult.rootPath) {
     // 在现有 monorepo 中添加 app
-    await addAppToMonorepo(monorepoResult.rootPath, monorepoResult.workspaces, packageManager);
+    const appType = await askAppType();
+    if (appType === "pro") {
+      await addProToMonorepo(monorepoResult.rootPath, monorepoResult.workspaces, packageManager);
+    } else {
+      await addAppToMonorepo(monorepoResult.rootPath, monorepoResult.workspaces, packageManager);
+    }
   } else {
     // 未检测到 monorepo，询问项目类型
     const projectType = await askProjectType();

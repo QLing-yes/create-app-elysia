@@ -14,6 +14,7 @@ export {
   askMonorepoLocation,
   askMonorepoName,
   askProjectType,
+  askAppType,
   type MonorepoLocationResult,
 } from "./00-monorepo-detect";
 

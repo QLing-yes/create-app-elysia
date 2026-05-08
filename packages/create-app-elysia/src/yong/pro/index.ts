@@ -24,6 +24,7 @@ import {
   divider,
   step,
 } from "../../utils";
+import { getMonorepoWorkspaces } from "../../utils/monorepo-detector";
 import * as ti from "../../ti";
 import {
   askDatabase,
@@ -32,8 +33,13 @@ import {
   askDevTools,
   askFormatter,
   askProFeatures,
+  askMonorepoLocation,
 } from "../../prompts";
 import * as tpl from "./templates";
+
+// ═══════════════════════════════════════════════════════════
+// 公开导出
+// ═══════════════════════════════════════════════════════════
 
 export async function createProProject(
   dir: string,
@@ -47,7 +53,75 @@ export async function createProProject(
   divider();
   step("正在收集配置...");
 
-  // 漏斗式提问
+  const prefs = await collectProPreferences(projectName, packageManager, args);
+
+  await checkAndClearDirectory(projectDir, projectName);
+  divider();
+
+  await generateProFiles(projectDir, projectName, prefs);
+  await installAndFinish(projectDir, dir, prefs);
+}
+
+export async function addProToMonorepo(
+  monorepoRoot: string,
+  workspaces: string[],
+  packageManager: string,
+) {
+  const ws = await getMonorepoWorkspaces(monorepoRoot, workspaces);
+  const location = await askMonorepoLocation(monorepoRoot, ws.apps, ws.packages);
+
+  title("🚀 在 Monorepo 中添加 Pro 专业版应用");
+  divider();
+  step("正在收集配置...");
+
+  const prefs = await collectProPreferences(location.projectName, packageManager, { install: false });
+  prefs.dir = path.relative(monorepoRoot, location.fullPath);
+
+  divider();
+
+  await generateProFiles(location.fullPath, location.projectName, prefs);
+
+  divider();
+  success("🎉 Pro 专业版应用创建成功！");
+  divider();
+
+  const relativePath = path.relative(monorepoRoot, location.fullPath);
+
+  const lines: string[] = [];
+  lines.push(`📁 应用位置：${relativePath}`);
+  lines.push("");
+  lines.push("🚀 下一步：");
+  lines.push(`   cd ${relativePath}`);
+  lines.push("   bun dev");
+  lines.push("");
+  lines.push("💡 从 Monorepo 根目录运行：");
+  lines.push(`   bun run dev --filter=${location.projectName}`);
+  lines.push("");
+  lines.push("🧩 Pro 项目特性：");
+  lines.push("   - 自动路由（app/controller/**/*.ctrl.ts）");
+  lines.push("   - 全局 $g 注入（db, redis, logger, ctrl, success, error）");
+  lines.push("   - 标准响应格式 { msg, code, data }");
+  lines.push("   - 模型约定（.mold.ts → table + relations + schema）");
+  if (prefs.clusterEnabled) {
+    lines.push("   - 集群模式（多进程 + 熔断器）");
+  }
+  if (prefs.withMenu) {
+    lines.push("   - CLI 交互菜单（bun menu）");
+  }
+  lines.push("   - 代码生成（bun generate）");
+
+  console.log(lines.join("\n"));
+}
+
+// ═══════════════════════════════════════════════════════════
+// 内部函数
+// ═══════════════════════════════════════════════════════════
+
+async function collectProPreferences(
+  projectName: string,
+  packageManager: string,
+  args: Record<string, unknown>,
+): Promise<Preferences> {
   const dbConfig = await askDatabase(false, "Bun");
   const { plugins } = await askPlugins();
   const integrations = await askIntegrations(false);
@@ -55,9 +129,7 @@ export async function createProProject(
   const { formatter } = await askFormatter(false);
   const { clusterEnabled, withMenu } = await askProFeatures();
 
-  // 组装 Preferences
   const prefs = new Preferences();
-  prefs.dir = dir;
   prefs.projectName = projectName;
   prefs.packageManager = packageManager as "bun";
   prefs.runtime = "Bun";
@@ -79,12 +151,14 @@ export async function createProProject(
   prefs.withMenu = withMenu;
   prefs.noInstall = !Boolean(args.install ?? true);
 
-  // 检查目录
-  await checkAndClearDirectory(projectDir, projectName);
+  return prefs;
+}
 
-  divider();
-
-  // 生成文件
+async function generateProFiles(
+  projectDir: string,
+  projectName: string,
+  prefs: Preferences,
+) {
   await task("正在生成项目文件...", async ({ setTitle }) => {
     // 基础文件
     step("正在写入基础文件...");
@@ -102,7 +176,6 @@ export async function createProProject(
     await createOrFindDir(joinPath(projectDir, "app"));
     await writeFile(joinPath(projectDir, "app/index.ts"), tpl.getAppIndex());
 
-    // Cluster mode
     if (prefs.clusterEnabled) {
       await writeFile(joinPath(projectDir, "app/cluster.ts"), tpl.getClusterFile());
     }
@@ -179,8 +252,13 @@ export async function createProProject(
 
     setTitle("✅ Pro 专业版模板生成完成！");
   });
+}
 
-  // 安装依赖
+async function installAndFinish(
+  projectDir: string,
+  dir: string,
+  prefs: Preferences,
+) {
   if (!prefs.noInstall) {
     const commands = ti.getInstallCommands(prefs);
     for (const command of commands) {
@@ -190,7 +268,6 @@ export async function createProProject(
     }
   }
 
-  // 完成提示
   divider();
   success("🎉 Pro 专业版项目创建成功！");
   divider();

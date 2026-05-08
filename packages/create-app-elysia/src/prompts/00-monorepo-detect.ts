@@ -130,3 +130,20 @@ export async function askMonorepoName(): Promise<string> {
 
   return name;
 }
+
+/**
+ * 在 monorepo 内选择应用类型
+ */
+export async function askAppType(): Promise<"standard" | "pro"> {
+  const { appType } = await prompt<{ appType: "standard" | "pro" }>({
+    type: "select",
+    name: "appType",
+    message: "你想创建什么类型的应用？",
+    choices: [
+      { name: "standard", message: "标准应用 (Standard)", hint: "最小化的 Elysia 后端" },
+      { name: "pro", message: "Pro 专业版", hint: "生产就绪，含自动路由、集群、菜单、日志等基础设施" },
+    ],
+  });
+
+  return appType;
+}
