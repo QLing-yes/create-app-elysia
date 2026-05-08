@@ -5,4 +5,4 @@
 
 export { createStandalone } from "./standalone/index";
 export { createNewMonorepo, addAppToMonorepo } from "./monorepo/index";
-export { createDDProject } from "./dd/index";
+export { createProProject } from "./pro/index";

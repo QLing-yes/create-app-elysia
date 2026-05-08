@@ -1,5 +1,5 @@
 /**
- * 用 DD - DD 全栈项目创建编排
+ * 用 Pro - Pro 专业版项目创建编排
  * 调共享 prompts + 共享 ti + 私有模板生成文件
  */
 
@@ -31,11 +31,11 @@ import {
   askIntegrations,
   askDevTools,
   askFormatter,
-  askDDFeatures,
+  askProFeatures,
 } from "../../prompts";
 import * as tpl from "./templates";
 
-export async function createDDProject(
+export async function createProProject(
   dir: string,
   packageManager: string,
   args: Record<string, unknown>,
@@ -43,7 +43,7 @@ export async function createDDProject(
   const projectDir = resolvePath(dir);
   const projectName = path.basename(projectDir);
 
-  title("🚀 Create Elysia DD 全栈项目");
+  title("🚀 Create Elysia Pro 专业版项目");
   divider();
   step("正在收集配置...");
 
@@ -53,7 +53,7 @@ export async function createDDProject(
   const integrations = await askIntegrations(false);
   const devTools = await askDevTools(false);
   const { formatter } = await askFormatter(false);
-  const { clusterEnabled, withMenu } = await askDDFeatures();
+  const { clusterEnabled, withMenu } = await askProFeatures();
 
   // 组装 Preferences
   const prefs = new Preferences();
@@ -88,12 +88,12 @@ export async function createDDProject(
   await task("正在生成项目文件...", async ({ setTitle }) => {
     // 基础文件
     step("正在写入基础文件...");
-    await writeFile(joinPath(projectDir, "package.json"), tpl.getDDPackageJson(prefs));
-    await writeFile(joinPath(projectDir, "tsconfig.json"), tpl.getDDTsConfig());
-    await writeFile(joinPath(projectDir, ".gitignore"), tpl.getDDGitignore());
-    await writeFile(joinPath(projectDir, "README.md"), tpl.getDDReadme(projectName));
-    await writeFile(joinPath(projectDir, ".env"), tpl.getDDEnv(prefs));
-    await writeFile(joinPath(projectDir, "bunfig.toml"), tpl.getDDBunfig());
+    await writeFile(joinPath(projectDir, "package.json"), tpl.getProPackageJson(prefs));
+    await writeFile(joinPath(projectDir, "tsconfig.json"), tpl.getProTsConfig());
+    await writeFile(joinPath(projectDir, ".gitignore"), tpl.getProGitignore());
+    await writeFile(joinPath(projectDir, "README.md"), tpl.getProReadme(projectName));
+    await writeFile(joinPath(projectDir, ".env"), tpl.getProEnv(prefs));
+    await writeFile(joinPath(projectDir, "bunfig.toml"), tpl.getProBunfig());
     await writeFile(joinPath(projectDir, "biome.jsonc"), tpl.getBiomeJson());
     await writeFile(joinPath(projectDir, "drizzle.config.ts"), tpl.getDrizzleConfig());
 
@@ -177,7 +177,7 @@ export async function createDDProject(
     await createOrFindDir(joinPath(projectDir, "public"));
     await writeFile(joinPath(projectDir, "public/.gitkeep"), "");
 
-    setTitle("✅ DD 全栈模板生成完成！");
+    setTitle("✅ Pro 专业版模板生成完成！");
   });
 
   // 安装依赖
@@ -192,7 +192,7 @@ export async function createDDProject(
 
   // 完成提示
   divider();
-  success("🎉 DD 全栈项目创建成功！");
+  success("🎉 Pro 专业版项目创建成功！");
   divider();
 
   const lines: string[] = [];
@@ -231,7 +231,7 @@ export async function createDDProject(
   }
 
   lines.push("");
-  lines.push("🧩 DD 项目特性：");
+  lines.push("🧩 Pro 项目特性：");
   lines.push("   - 自动路由（app/controller/**/*.ctrl.ts）");
   lines.push("   - 全局 $g 注入（db, redis, logger, ctrl, success, error）");
   lines.push("   - 标准响应格式 { msg, code, data }");

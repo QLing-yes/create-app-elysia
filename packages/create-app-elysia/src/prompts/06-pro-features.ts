@@ -1,17 +1,17 @@
 /**
- * 步骤 6: DD 全栈模板专属功能
- * 仅在用户选择 dd 项目类型时调用
+ * 步骤 6: Pro 专业版模板专属功能
+ * 仅在用户选择 pro 项目类型时调用
  */
 
 import enquirer from "enquirer-esm";
 const { prompt } = enquirer;
 
-export interface DDFeaturesResult {
+export interface ProFeaturesResult {
   clusterEnabled: boolean;
   withMenu: boolean;
 }
 
-export async function askDDFeatures(): Promise<DDFeaturesResult> {
+export async function askProFeatures(): Promise<ProFeaturesResult> {
   const { clusterEnabled } = await prompt<{ clusterEnabled: boolean }>({
     type: "toggle",
     name: "clusterEnabled",

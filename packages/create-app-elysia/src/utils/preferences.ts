@@ -83,7 +83,7 @@ export class Preferences {
   // 格式化工具
   formatter: "ultracite" | "biome" | "eslint" | "none" = "ultracite";
 
-  // DD 全栈模板专属
+  // Pro 专业版模板专属
   clusterEnabled = false;
   withMenu = false;
 }

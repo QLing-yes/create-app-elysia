@@ -1,9 +1,9 @@
-export { getDDPackageJson } from "./package-json";
-export { getDDTsConfig } from "./tsconfig";
-export { getDDGitignore } from "./gitignore";
-export { getDDBunfig } from "./bunfig";
-export { getDDReadme } from "./readme";
-export { getDDEnv } from "./env";
+export { getProPackageJson } from "./package-json";
+export { getProTsConfig } from "./tsconfig";
+export { getProGitignore } from "./gitignore";
+export { getProBunfig } from "./bunfig";
+export { getProReadme } from "./readme";
+export { getProEnv } from "./env";
 export { getBiomeJson } from "./biome-json";
 export { getDrizzleConfig } from "./drizzle-config";
 export { getAppIndex } from "./app-index";

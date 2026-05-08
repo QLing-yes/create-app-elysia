@@ -11,7 +11,7 @@ import minimist from "minimist";
 import { error, title, divider, detectPackageManager } from "./utils";
 import { detectMonorepo } from "./utils/monorepo-detector";
 import { askProjectType } from "./prompts/00-monorepo-detect";
-import { createStandalone, createNewMonorepo, addAppToMonorepo, createDDProject } from "./yong";
+import { createStandalone, createNewMonorepo, addAppToMonorepo, createProProject } from "./yong";
 
 process.on("unhandledRejection", async (err) => {
   console.error(err);
@@ -45,8 +45,8 @@ async function main() {
     const projectType = await askProjectType();
     if (projectType === "monorepo") {
       await createNewMonorepo(dir, packageManager, args);
-    } else if (projectType === "dd") {
-      await createDDProject(dir, packageManager, args);
+    } else if (projectType === "pro") {
+      await createProProject(dir, packageManager, args);
     } else {
       await createStandalone(dir, packageManager, args);
     }

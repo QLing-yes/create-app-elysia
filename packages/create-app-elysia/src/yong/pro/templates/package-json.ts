@@ -1,7 +1,7 @@
 import { dedent } from "ts-dedent";
 import type { PreferencesType } from "../../../types";
 
-export function getDDPackageJson(prefs: PreferencesType): string {
+export function getProPackageJson(prefs: PreferencesType): string {
   const dbDriver = getDriverPackage(prefs.database, prefs.driver);
   const scripts = getScripts(prefs);
   const deps = getDependencies(prefs, dbDriver);

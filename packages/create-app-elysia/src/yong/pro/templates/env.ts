@@ -1,6 +1,6 @@
 import type { PreferencesType } from "../../../types";
 
-export function getDDEnv(prefs: PreferencesType): string {
+export function getProEnv(prefs: PreferencesType): string {
   const dbType = prefs.database;
   const lines: string[] = [
     "PORT=3000",

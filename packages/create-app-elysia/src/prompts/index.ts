@@ -22,4 +22,4 @@ export { askPlugins, type PluginsResult } from "./02-plugins";
 export { askIntegrations, type IntegrationsResult } from "./03-integrations";
 export { askDevTools, type DevToolsResult } from "./04-dev-tools";
 export { askFormatter, type FormatterResult } from "./05-formatter";
-export { askDDFeatures, type DDFeaturesResult } from "./06-dd-features";
+export { askProFeatures, type ProFeaturesResult } from "./06-pro-features";

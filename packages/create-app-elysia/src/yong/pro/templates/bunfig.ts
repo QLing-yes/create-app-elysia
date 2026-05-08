@@ -1,6 +1,6 @@
 import { dedent } from "ts-dedent";
 
-export function getDDBunfig(): string {
+export function getProBunfig(): string {
   return dedent`
     # 在 "bun run" 之前运行的脚本
     # preload = ["./support/script/index.ts"] #遇到问题，先注释掉

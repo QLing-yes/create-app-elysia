@@ -1,6 +1,6 @@
 import { dedent } from "ts-dedent";
 
-export function getDDTsConfig(): string {
+export function getProTsConfig(): string {
   return dedent`
     {
       "compilerOptions": {

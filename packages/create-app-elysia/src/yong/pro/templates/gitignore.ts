@@ -1,6 +1,6 @@
 import { dedent } from "ts-dedent";
 
-export function getDDGitignore(): string {
+export function getProGitignore(): string {
   return dedent`
     # dependencies
     /node_modules

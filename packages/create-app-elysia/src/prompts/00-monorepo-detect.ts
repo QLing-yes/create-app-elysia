@@ -93,15 +93,15 @@ export async function askMonorepoLocation(
 /**
  * 未检测到 monorepo 时，询问创建类型
  */
-export async function askProjectType(): Promise<"standalone" | "monorepo" | "dd"> {
-  const { projectType } = await prompt<{ projectType: "standalone" | "monorepo" | "dd" }>({
+export async function askProjectType(): Promise<"standalone" | "monorepo" | "pro"> {
+  const { projectType } = await prompt<{ projectType: "standalone" | "monorepo" | "pro" }>({
     type: "select",
     name: "projectType",
     message: "你想创建什么类型的项目？",
     choices: [
       { name: "standalone", message: "独立项目 (Standalone)", hint: "单个 Elysia 项目" },
       { name: "monorepo", message: "Monorepo（多项目仓库）", hint: "包含 Elysia + 共享包的多项目结构" },
-      { name: "dd", message: "DD 全栈项目", hint: "Elysia + Drizzle 全栈应用，含自动路由、集群、菜单" },
+      { name: "pro", message: "Pro 专业版", hint: "生产就绪，含自动路由、集群、菜单、日志等基础设施" },
     ],
   });
 

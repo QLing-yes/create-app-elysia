@@ -1,6 +1,6 @@
 import { dedent } from "ts-dedent";
 
-export function getDDReadme(projectName: string): string {
+export function getProReadme(projectName: string): string {
   return dedent`
     # ${projectName}
 
