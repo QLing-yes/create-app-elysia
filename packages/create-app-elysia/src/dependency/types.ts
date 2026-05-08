@@ -24,6 +24,8 @@ export interface Dependencies {
     pg:                         string;
     postgres:                   string;
     mysql2:                     string;
+    "@elysiajs/openapi":         string;
+    "drizzle-typebox":           string;
     "@elysiajs/bearer":         string;
     "@elysiajs/cors":           string;
     "@elysiajs/html":           string;
@@ -59,6 +61,7 @@ export interface DevDependencies {
     "ioredis-mock":          string;
     "@electric-sql/pglite":  string;
     "@elysiajs/eden":        string;
+    "bun-types":             string;
 }
 
 export interface PeerDependencies {

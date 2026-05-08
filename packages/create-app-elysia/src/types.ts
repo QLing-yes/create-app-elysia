@@ -70,6 +70,8 @@ export interface PartialPreferences {
   mockWithPGLite?: boolean;
   husky?: boolean;
   formatter?: "ultracite" | "biome" | "eslint" | "none";
+  clusterEnabled?: boolean;
+  withMenu?: boolean;
 }
 
 // 完整的 Preferences 类型引用
