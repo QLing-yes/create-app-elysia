@@ -470,6 +470,8 @@ async function getTemplateDirs() {
  * @returns {Promise<void>}
  */
 async function syncRemoteTemplates() {
+  if (!APP_CONFIG.templateSyncRepo) return;
+
   const spinner = ora('同步远程模板…').start();
 
   try {
@@ -614,7 +616,21 @@ async function handleCreate(nameArg, opts) {
 
   // Step 1 — 初始化运行时选项
   const templateDirs = await getTemplateDirs();
-  const { validSelections, selectionChoices, nextSteps } = buildRuntimeOptions(templateDirs);
+  const hasTemplates = templateDirs.length > 0;
+
+  /** @type {Set<string>} */
+  let validSelections = new Set();
+  /** @type {object[]} */
+  let selectionChoices = [];
+  /** @type {Record<string, string[]>} */
+  let nextSteps = {};
+
+  if (hasTemplates) {
+    const runtime = buildRuntimeOptions(templateDirs);
+    validSelections  = runtime.validSelections;
+    selectionChoices = runtime.selectionChoices;
+    nextSteps        = runtime.nextSteps;
+  }
 
   // Step 2 — 加载用户配置文件
   const fileConfig = opts.configPath
@@ -623,8 +639,13 @@ async function handleCreate(nameArg, opts) {
 
   // Step 3 — 收集用户输入
   const projectName = await askProjectName(nameArg);
-  const selection   = await askSelection(opts.select, validSelections, selectionChoices);
-  const projectDir  = path.resolve(process.cwd(), projectName);
+
+  /** @type {string} */
+  const selection = hasTemplates
+    ? await askSelection(opts.select, validSelections, selectionChoices)
+    : '';
+
+  const projectDir = path.resolve(process.cwd(), projectName);
 
   // Step 4 — 目录冲突处理
   await handleDirConflict(projectDir, projectName, opts);
@@ -637,7 +658,7 @@ async function handleCreate(nameArg, opts) {
 
   console.log();
 
-  // Step 6 — 拉取项目模板
+  // Step 6 — 拉取主项目
   const repo = fileConfig.template ?? APP_CONFIG.defaultRepo;
   try {
     await git.cloneRepo({ repo, dest: projectDir, branch: APP_CONFIG.git.mainBranch });
@@ -646,14 +667,19 @@ async function handleCreate(nameArg, opts) {
     logger.error('克隆失败，已清理目标目录', err);
   }
 
-  // Step 7 — 应用本地模板覆盖文件
-  await fsu.applyTemplates(selection, [], projectDir, TEMPLATE_DIR);
+  // Step 7 — 应用本地模板覆盖文件（仅当有模板时）
+  if (hasTemplates) {
+    await fsu.applyTemplates(selection, [], projectDir, TEMPLATE_DIR);
+  }
 
   // Step 8 — 后处理操作
   await runOperations(['updateName'], { projectDir, projectName, selection });
 
   // Step 9 — 完成提示 & 清理临时模板
-  printNextSteps(projectName, nextSteps[selection] ?? APP_CONFIG.defaultNextSteps);
+  const steps = hasTemplates
+    ? (nextSteps[selection] ?? APP_CONFIG.defaultNextSteps)
+    : APP_CONFIG.defaultNextSteps;
+  printNextSteps(projectName, steps);
   await fs.emptyDir(TEMPLATE_DIR);
 }
 
